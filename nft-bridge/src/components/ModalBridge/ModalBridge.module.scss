@@ -1,0 +1,128 @@
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modalContent {
+    width: 430px;
+    height: 505px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    margin: 64px 353px 143px;
+    padding: 24px 0 0;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
+    border: solid 1px #444652;
+    background-color: #191c26;
+
+    ::backdrop {
+        color: rgba(0, 0, 0, 0.1);
+    }
+
+}
+
+.modalHeader {
+    height: 32px;
+    align-self: stretch;
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    padding: 0 24px;
+}
+
+.modalTitle {
+    margin: 0;
+}
+
+.modalBody {
+    flex-grow: 0;
+    display: flex;
+    align-self: stretch;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0 24px;
+    border-top: solid 1px #444652;
+}
+
+.frame11142 {
+    height: 32px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0;
+}
+
+.text1 {
+    width: 150px;
+    height: 32px;
+    flex-grow: 0;
+    font-family: Rajdhani;
+    font-size: 24px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.33;
+    letter-spacing: normal;
+    text-align: left;
+    color: #fff;
+}
+
+.close {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+    color: #444652;
+}
+
+.close:hover {
+    opacity: 1;
+}
+
+.close:before,
+.close:after {
+    align-items: center;
+    justify-items: center;
+    position: absolute;
+    content: ' ';
+    height: 17px;
+    width: 2px;
+    background-color: #444652;
+}
+
+.close:before {
+    transform: rotate(45deg);
+}
+
+.close:after {
+    transform: rotate(-45deg);
+}
+
+.frame11139 {
+    flex-grow: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0 24px;
+}

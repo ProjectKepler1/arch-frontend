@@ -6,17 +6,24 @@ import question from '../../assets/svg/vector/Tool Tips .svg'
 import { accountInfo } from '../../providers/WalletsProvider'
 import ModifiedInput from '../ModifiedInput/ModifiedInput'
 import InputError from '../ErrorState/InputError'
+import ModalBridge from '../ModalBridge/ModalBridge'
+import HandleCheck from '../HandleCheck/HandleCheck'
 const Process = () => {
     const [inputState, setInputState] = useState(false)
     const [errorState, setErrorState] = useState(false)
+    const [show, setShow] = useState(false)
+    const [change, setChange] = useState(false)
     const starknetAddress = accountInfo.L2.account
     let maxInput = 7
     let x = 2
     const addInputField = () => {
         if (x < maxInput) {
             x++;
-
         }
+    }
+    const handleChange = () => {
+        setChange(!change)
+        console.log(change)
     }
     const handleInputState = () => {
         if (starknetAddress.length < 3) {
@@ -42,11 +49,11 @@ const Process = () => {
                     <div className={styles.text}>Select ERC721 Address</div>
                     <div className={styles.bordSub}>Manually enter address</div>
                     <label className={styles.checkboxStyle}>
-                        <input type='checkbox' className={styles.checkbox}></input>
+                        <input type='checkbox' className={styles.checkbox} onChange={handleChange}></input>
                         <span className={styles.checkmark}></span>
                     </label>
                 </div>
-                <input className={styles.input1} placeholder='Enter Address'></input>
+                <HandleCheck change={change} />
                 <div className={styles.endblock1}>
                     <div className={styles.subBlock1}>
                         <div className={styles.subText2}>Verify Bridge Registry to Proceed</div>

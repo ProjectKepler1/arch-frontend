@@ -1,0 +1,78 @@
+.selector {
+    cursor: pointer;
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-self: stretch;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px 8px 0;
+}
+
+.selector:hover .text {
+    color: #57c6e4
+}
+
+.selector:hover .subText {
+    color: #57c6e4
+}
+
+.selector:hover .span {
+    color: #57c6e4
+}
+
+
+.frame11139 {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0;
+
+}
+
+.text {
+
+    flex-grow: 0;
+    font-family: Rajdhani;
+    font-size: 16px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+    text-align: left;
+    color: #fff;
+}
+
+.subText {
+    align-self: stretch;
+    flex-grow: 0;
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.67;
+    letter-spacing: normal;
+    text-align: left;
+    color: #444652;
+
+}
+
+.span {
+
+    align-self: stretch;
+    flex-grow: 0;
+    font-family: Rajdhani;
+    font-size: 16px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+    text-align: right;
+    color: #fff;
+}

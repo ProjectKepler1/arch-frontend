@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActionType } from '../../enums/ActionType';
 import { ChainInfo } from '../../enums/ChainType';
 import { LoginErrorType } from '../../enums/LoginErrorType'
@@ -8,15 +8,12 @@ import { WalletStatus } from '../../enums/WalletStatus';
 import { useEnvs } from '../../hooks/useEnvs';
 import { useLoginTracking } from '../../hooks/useTracking';
 import { useWalletHandlerProvider } from '../../hooks/useWalletHandlerProvider';
-import { useHideModal } from '../../providers/ModalProvider';
-import { useProgressModal } from '../../providers/ModalProvider';
 import { evaluate } from '../../utils/object';
 import { isChrome } from '../../utils/browser';
 import Image from 'next/image';
 import { truncateAddress, truncateAddress2 } from '../../utils';
 import WalletBalance from '../../components/WalletBalance';
 import { accountInfo, useLoginWallet, useWalletsStatus } from '../../providers/WalletsProvider';
-const MODAL_TIMEOUT_DURATION = 2000;
 const AUTO_CONNECT_TIMEOUT_DURATION = 100;
 import styles from './Login.module.scss'
 import starknetLogo from '../../assets/svg/logos/starknet.png'
@@ -26,7 +23,7 @@ import MetamaskLogo from '../../assets/svg/wallets/metamask.svg'
 import BraavosLogo from '../../assets/svg/wallets/Braavos.svg'
 import ArgentXLogo from '../../assets/svg/wallets/ArgentX.svg'
 import logInLogo from '../../assets/svg/vector/log-in.svg'
-import Web3 from 'web3';
+import { web3 } from '../../libs';
 
 export const Login = () => {
     const [trackLoginScreen, trackDownloadClick, trackWalletClick, trackLoginError] =
@@ -36,13 +33,10 @@ export const Login = () => {
     const [error, setError] = useState<any>(null);
     const [network, setNetwork] = useState(NetworkType.L1);
     const { statusL1, statusL2 } = useWalletsStatus();
+    const [EthBalanceMeta, setEthBalanceMeta] = useState(0)
+    const [EthBalanceStark, setEthBalanceStark] = useState(0)
     const { walletAccount, walletError, walletStatus, connectWallet } = useLoginWallet(network);
     const walletHandlers = useWalletHandlerProvider(network);
-    const modalTimeoutId = useRef<any>(null);
-    const hideModal = useHideModal();
-    const showProgressModal = useProgressModal();
-    console.log(error)
-    console.log(process.env.NEXT_PUBLIC_REACT_APP_SUPPORTED_CHAIN_ID)
     useEffect(() => {
         trackLoginScreen();
         if (!isChrome()) {
@@ -57,14 +51,6 @@ export const Login = () => {
             network !== NetworkType.L2 && setNetwork(NetworkType.L2);
         }
     }, [statusL1, statusL2]);
-
-
-    useEffect(() => {
-        handleModal();
-        return () => {
-            maybeHideModal();
-        };
-    }, [walletStatus]);
 
     useEffect(() => {
         let timeoutId: any;
@@ -96,25 +82,17 @@ export const Login = () => {
         return connectWallet(config);
     };
 
-
-    const handleModal = () => {
-        switch (walletStatus) {
-            case WalletStatus.CONNECTING:
-                maybeShowModal();
-                break;
-            case WalletStatus.CONNECTED:
-                setSelectedWalletName('');
-                setError(null);
-                maybeHideModal();
-                break;
-            case WalletStatus.ERROR:
-            case WalletStatus.DISCONNECTED:
-                maybeHideModal();
-                break;
-            default:
-                break;
+    useEffect(() => {
+        const EthBalance = async () => {
+            const res = await web3.eth.getBalance(accountInfo.L1.account)
+            setEthBalanceMeta(res)
+            EthBalance()
+                .catch(console.error)
         }
-    };
+    }, [statusL1])
+
+
+
 
     const handleWalletError = (error: any) => {
         if (error.name === WalletErrorType.CHAIN_UNSUPPORTED_ERROR) {
@@ -127,38 +105,6 @@ export const Login = () => {
         }
     };
 
-    const maybeShowModal = () => {
-        maybeHideModal();
-        modalTimeoutId.current = setTimeout(() => {
-            showProgressModal(selectedWalletName, evaluate('Waiting for confirmation from {{walletName}}', { walletName: selectedWalletName }));
-        }, MODAL_TIMEOUT_DURATION);
-    };
-
-    const maybeHideModal = () => {
-        if (typeof modalTimeoutId.current === 'number') {
-            clearTimeout(modalTimeoutId.current);
-            modalTimeoutId.current = null;
-        }
-        hideModal();
-    };
-
-    const mapLoginWalletsToChoices = () => {
-        return walletHandlers.map((walletHandler: any) => {
-            const {
-                config: { id, description, name, logoPath }
-            } = walletHandler;
-            // onWalletConnect(walletHandler)
-            return {
-                id,
-                description,
-                isDisabled: !isChrome(),
-                isLoading: walletStatus === WalletStatus.CONNECTING,
-                logoPath,
-                name,
-                onClick: () => onWalletConnect(walletHandler)
-            };
-        });
-    };
 
     const handleClickEth = () => {
         if (network === NetworkType.L1) {
@@ -204,14 +150,14 @@ export const Login = () => {
         }
     }
     return (
-
         <div className={styles.frame11143}>
             <ConnectWallet name="Ethereum"
                 network="ETH"
                 logoURL={ethLogo}
                 type="mainnet"
-                address={statusL1 === WalletStatus.CONNECTED ? truncateAddress2(accountInfo.L1.account) : "Connect your wallet"}
-                balance='0.001'>
+                address={statusL1 === WalletStatus.CONNECTED ? truncateAddress2(accountInfo.L1.account) : "-"}
+                balance={statusL1 === WalletStatus.CONNECTED ? EthBalanceMeta : '-'}
+                error={network === NetworkType.L1 ? error?.message : null}>
                 <ConnectButton name={"Ethereum"} />
             </ConnectWallet>
             < ConnectWallet
@@ -219,33 +165,15 @@ export const Login = () => {
                 network="STARKNET"
                 logoURL={starknetLogo}
                 type="mainnet"
-                address={statusL2 === WalletStatus.CONNECTED ? truncateAddress(accountInfo.L2.account) : "Connect your wallet"}
-                balance='0.001'>
+                address={statusL2 === WalletStatus.CONNECTED ? truncateAddress(accountInfo.L2.account) : "-"}
+                balance={statusL2 === WalletStatus.CONNECTED ? '0.000' : '-'}
+                error={network === NetworkType.L2 ? error?.message : null}>
                 <ConnectButton name={"StarkNet"} />
             </ConnectWallet>
 
         </div>
 
-        // <Flex backgroundColor={"rgb(25, 34, 53)"} height='100%' width={"100%"} borderWidth='0.5px' borderColor={'gray'} flexDir='column' borderRadius='10px' padding='16px' paddingTop={"0px"} >
-        //     <WalletBalance
-        //         name="Ethereum"
-        //         network="ETH"
-        //         logoURL="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png"
-        //         type="mainnet"
-        //         address="Connect your wallet "
-        //         balance='0.001' />
-        //     < WalletBalance
-        //         name="Starknet"
-        //         network="STARKNET"
-        //         logoURL="https://www.starknet-ecosystem.com/starknet-logo.png"
-        //         type="testnet"
-        //         address="Connect your wallet"
-        //         balance='0.001' />
 
-        //     <Flex width='100%' >
-        //         <Button marginLeft='auto' onClick={() => handleClick()} > Connect your wallet</Button>
-        //     </Flex>
-        // </Flex >
 
     );
 };
