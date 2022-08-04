@@ -11,7 +11,7 @@ import { useWalletHandlerProvider } from '../../hooks/useWalletHandlerProvider';
 import { evaluate } from '../../utils/object';
 import { isChrome } from '../../utils/browser';
 import Image from 'next/image';
-import { truncateAddress, truncateAddress2 } from '../../utils';
+import { parseFromDecimals, promiseHandler, truncateAddress, truncateAddress2 } from '../../utils';
 import WalletBalance from '../../components/WalletBalance';
 import { accountInfo, useLoginWallet, useWalletsStatus } from '../../providers/WalletsProvider';
 const AUTO_CONNECT_TIMEOUT_DURATION = 100;
@@ -82,17 +82,14 @@ export const Login = () => {
         return connectWallet(config);
     };
 
-    useEffect(() => {
-        const EthBalance = async () => {
-            const res = await web3.eth.getBalance(accountInfo.L1.account)
-            setEthBalanceMeta(res)
-            EthBalance()
-                .catch(console.error)
+
+    const EthBalance = useCallback(async () => {
+        const [res, error] = await promiseHandler(web3.eth.getBalance(accountInfo.L1.account))
+        if (error) {
+            return Promise.reject(error);
         }
-    }, [statusL1])
-
-
-
+        setEthBalanceMeta(res);
+    }, [])
 
     const handleWalletError = (error: any) => {
         if (error.name === WalletErrorType.CHAIN_UNSUPPORTED_ERROR) {
