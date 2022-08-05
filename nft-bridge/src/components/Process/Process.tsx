@@ -11,7 +11,7 @@ import HandleCheck from '../HandleCheck/HandleCheck'
 const Process = () => {
     const [inputState, setInputState] = useState(false)
     const [errorState, setErrorState] = useState(false)
-    const [show, setShow] = useState(false)
+    const [show, setShow] = useState(false) 
     const [change, setChange] = useState(false)
     const starknetAddress = accountInfo.L2.account
     let maxInput = 7
