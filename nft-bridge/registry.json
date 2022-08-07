@@ -1,20 +1,20 @@
 [
     {
         "id": 1,
-        "name": "Lazy Lion",
-        "L1_address": "0x02c5378371ac064fb21ead98cfed90fd8d3e7ad8",
-        "L2_address": "0x020c5d994223ed55cf8d7fd8f920f1340500f9c98e854bbbe957099aa1e812f0"
+        "name": "Crypto Punks",
+        "L1_address": "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB",
+        "L2_address": "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB"
     },
     {
         "id": 2,
         "name": "BAYC",
-        "L1_address": "02bedc48984e54ecea6da1eafd2c9f931067872c5",
-        "L2_address": "0x020ca28e00fcf33b129d21df08a8e807e1ec9cd2c6449e74613b4357c727c0c5"
+        "L1_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
+        "L2_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"
     },
     {
         "id": 3,
-        "name": "test",
-        "L1_address": "0x000000000000000000000000000000000000000",
-        "L2_address": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "name": "Moonbirds",
+        "L1_address": "0x23581767a106ae21c074b2276d25e5c3e136a68b",
+        "L2_address": "0x23581767a106ae21c074b2276d25e5c3e136a68b"
     }
 ]

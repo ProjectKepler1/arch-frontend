@@ -7,21 +7,22 @@ const ModalBridge = (props: any) => {
         return (null)
     }
     return (
+
         <div className={styles.modal} onClick={() => props.onClose(null)}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <div className={styles.frame11142}>
-                        <div className={styles.text1}>
-                            Select Contract
+                        <div className={props.title === "Select Contract" ? styles.text1 : styles.text2}>
+                            {props.title}
                         </div>
                     </div>
                     <a className={styles.close} onClick={props.onClose}></a>
                 </div>
                 <div className={styles.modalBody}>
-                    <Registry onClose={(value: any) => props.onClose(value)} />
+                    <Registry onClose={(value: any) => props.onClose(value)} registry={props.registry} id={props.id} />
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 
