@@ -10,11 +10,14 @@ import ModalBridge from '../ModalBridge/ModalBridge'
 import HandleCheck from '../HandleCheck/HandleCheck'
 import registry from '../../../registry.json'
 import { getNFTsForOwnerFilteredByCollection } from '../../nft-api/Alchemy'
-
+import ConfirmationScreen from '../ConfirmationScreen/ConfirmationScreen'
+import { truncateAddress } from '../../utils'
 const Process = () => {
     const [inputState, setInputState] = useState(false)
     const [errorState, setErrorState] = useState(false)
     const [show, setShow] = useState(false)
+    const [contract, setContract] = useState(null)
+    const [tokenId, setTokenId] = useState<any>(null)
     const [bridgeregistry, setBridgeRegistry] = useState<any>()
     const [change, setChange] = useState(false)
     const [change1, setChange1] = useState(false)
@@ -29,9 +32,8 @@ const Process = () => {
     }
     const getNFTs = useCallback(() => {
         const countNFTs = async (collectionAddresses: string[], owner: string) => {
-            const firstFilteredPage = await getNFTsForOwnerFilteredByCollection('0x2137213d50207Edfd92bCf4CF7eF9E491A155357', collectionAddresses)
+            const firstFilteredPage = await getNFTsForOwnerFilteredByCollection('0x04FD71a7c80dee02cec42cA7C6941D0940CBf55f', collectionAddresses)
             setBridgeRegistry(firstFilteredPage)
-            console.log(firstFilteredPage)
         }
         if (registry) {
             countNFTs(registry.map(reg => reg.L1_address), metaAddress)
@@ -46,6 +48,7 @@ const Process = () => {
         setChange1(!change1)
     }
     const handleInputState = () => {
+        console.log(starknetAddress)
         if (starknetAddress.length < 3) {
             setErrorState(true)
         }
@@ -53,11 +56,14 @@ const Process = () => {
             setInputState(!inputState)
         }
     }
-
     useEffect(() => {
         if (registry) getNFTs()
     }, [registry])
 
+
+    const handleClick = () => {
+        return <ConfirmationScreen />
+    }
     return (
         <div className={styles.frame7}>
             <div className={styles.frame11142}>
@@ -77,7 +83,7 @@ const Process = () => {
                         <span className={styles.checkmark}></span>
                     </label>
                 </div>
-                <HandleCheck change={change} registry={bridgeregistry} change1={change1} id='1' />
+                <HandleCheck contract={contract} tokenId={tokenId} change={change} registry={bridgeregistry} change1={change1} returnContract={(value: any) => setContract(value)} returnTokenId={(value: any) => setTokenId(value)} id='1' />
                 <div className={styles.endblock1}>
                     <div className={styles.subBlock1}>
                         <div className={styles.subText2}>Verify Bridge Registry to Proceed</div>
@@ -97,7 +103,7 @@ const Process = () => {
                     </label>
 
                 </div>
-                <HandleCheck change={change} change1={change1} registry={bridgeregistry} id="2" />
+                <HandleCheck contract={contract} tokenId={tokenId} returnContract={(value: any) => setContract(value)} returnTokenId={(value: any) => setTokenId(value)} change={change} change1={change1} registry={bridgeregistry} id="2" />
             </div>
             <div className={styles.line4} />
             <div className={styles.bloc3}>
@@ -108,10 +114,21 @@ const Process = () => {
                     <div className={styles.subText4} onClick={handleInputState}>Use my StarkNet Address</div>
                 </div>
                 <InputError state={errorState} error="Please connect your Starknet wallet first" />
-                <ModifiedInput value={starknetAddress} state={inputState} />
+                <ModifiedInput value={truncateAddress(starknetAddress)} state={inputState} />
             </div>
             <div className={styles.bottom1}>
-                <button className={styles.button3}>Continue</button>
+                {
+                    !tokenId || !contract &&
+                    <button className={styles.button3} disabled>Continue</button>
+                }
+                {
+                    !tokenId && !contract &&
+                    <button className={styles.button3} disabled>Continue</button>
+                }
+                {
+                    contract != null && tokenId != null &&
+                    <button className={styles.button3} onClick={handleClick}>Continue</button>
+                }
             </div>
         </div >
     )

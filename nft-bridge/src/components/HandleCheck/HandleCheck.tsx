@@ -10,8 +10,13 @@ const HandleCheck = (props: any) => {
     const handleClose = (value: any) => {
         setShow(false);
         setSelected(value);
+        props.returnContract(value)
     }
-
+    const handleClose1 = (value: any) => {
+        setShow(false);
+        setSelected1(value);
+        props.returnTokenId(value)
+    }
     if (props.id === '1') {
         return (
             <>
@@ -23,7 +28,7 @@ const HandleCheck = (props: any) => {
                     !props.change &&
                     <>
                         <input className={styles.input0} placeholder={selected === null ? 'Enter Address' : selected} onClick={() => setShow(true)}></input>
-                        <ModalBridge onClose={(value: any) => handleClose(value)} show={show} registry={props.registry} title="Select Contract" id={props.id} />
+                        <ModalBridge onClose={(value: any) => handleClose(value)} show={show} registry={props.registry} title="Select Contract" id={props.id} selectedContract={selected} />
                     </>
                 }
             </>)
@@ -42,7 +47,7 @@ const HandleCheck = (props: any) => {
                     !props.change1 &&
                     <>
                         <input className={styles.input0} placeholder={selected1 === null ? 'Select Tokens IDs' : selected1} onClick={() => setShow(true)}></input>
-                        <ModalBridge onClose={(value: any) => handleClose(value)} show={show} registry={props.registry} title="Select TokensIDs to Bridge" id={props.id} />
+                        <ModalBridge onClose={(value: any) => handleClose1(value)} show={show} registry={props.registry} title="Select TokenIDs to Bridge" id={props.id} selectedContract={props.contract} />
                     </>
                 }
             </>

@@ -5,6 +5,7 @@ import "@fontsource/roboto"
 import BridgeDirectionOption from '../../components/BridgeDirectionOption/BridgeDirectionOption'
 import styles from './Bridge.module.scss'
 import Process from '../../components/Process/Process'
+import ConfirmationScreen from '../../components/ConfirmationScreen/ConfirmationScreen'
 
 
 const Bridge = () => {
@@ -24,6 +25,7 @@ const Bridge = () => {
                     </div>
                 </div>
                 <Process />
+                {/* <ConfirmationScreen /> */}
             </div>
             <Login />
 

@@ -139,7 +139,7 @@ export const Login = () => {
                     <div style={{ width: "24px", height: '100%', justifyContent: 'center', alignItems: 'center' }}>
                         <Image src={BraavosLogo} className={styles.image6}></Image>
                     </div>
-                    <span className={styles.connect}>Connect</span>
+                    <span className={styles.connect}>{props.status === WalletStatus.CONNECTED ? "Connected" : "Connect"}</span>
                     {/* <Image src={logInLogo} className={styles.login}></Image> */}
                 </div >
             )
@@ -155,7 +155,7 @@ export const Login = () => {
                 address={statusL1 === WalletStatus.CONNECTED ? truncateAddress2(accountInfo.L1.account) : "-"}
                 balance={statusL1 === WalletStatus.CONNECTED ? EthBalanceMeta : '-'}
                 error={network === NetworkType.L1 ? error?.message : null}>
-                <ConnectButton name={"Ethereum"} />
+                <ConnectButton name={"Ethereum"} status={statusL1} />
             </ConnectWallet>
             < ConnectWallet
                 name="StarkNet"
@@ -165,7 +165,7 @@ export const Login = () => {
                 address={statusL2 === WalletStatus.CONNECTED ? truncateAddress(accountInfo.L2.account) : "-"}
                 balance={statusL2 === WalletStatus.CONNECTED ? '0.000' : '-'}
                 error={network === NetworkType.L2 ? error?.message : null}>
-                <ConnectButton name={"StarkNet"} />
+                <ConnectButton name={"StarkNet"} status={statusL2} />
             </ConnectWallet>
 
         </div>

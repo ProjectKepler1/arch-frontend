@@ -16,13 +16,13 @@ const ModalBridge = (props: any) => {
                             {props.title}
                         </div>
                     </div>
-                    <a className={styles.close} onClick={props.onClose}></a>
+                    <a className={styles.close} onClick={() => props.onClose(null)}></a>
                 </div>
                 <div className={styles.modalBody}>
-                    <Registry onClose={(value: any) => props.onClose(value)} registry={props.registry} id={props.id} />
+                    <Registry onClose={(value: any) => props.onClose(value)} registry={props.registry} id={props.id} selectedContract={props.selectedContract} />
                 </div>
-            </div>
-        </div >
+            </div >
+        </div>
     )
 }
 

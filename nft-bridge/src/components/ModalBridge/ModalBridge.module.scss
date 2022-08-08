@@ -50,6 +50,9 @@
 
 .modalBody {
     flex-grow: 0;
+    width: 430px;
+    overflow: auto;
+    scroll-behavior: auto;
     display: flex;
     align-self: stretch;
     flex-direction: column;
@@ -188,4 +191,27 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+}
+
+.button3 {
+    align-self: stretch;
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: #57c6e4;
+}
+
+.bottom1 {
+    align-self: stretch;
+    flex-grow: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 10px;
+    padding: 16px;
 }

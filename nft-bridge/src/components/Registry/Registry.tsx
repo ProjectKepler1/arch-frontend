@@ -1,28 +1,67 @@
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import styles from './Registry.module.scss'
 import { getNFTsForOwnerFilteredByCollection } from '../../nft-api/Alchemy'
-import { accountInfo } from '../../providers/WalletsProvider'
+import { accountInfo, useL1Wallet } from '../../providers/WalletsProvider'
 import { promiseHandler } from '../../utils'
 import registry from '../../../registry.json'
 import Image from 'next/image'
+import { StyledStepper } from '@chakra-ui/react'
 const Registry = (props: any) => {
-    const id = props.id
+    const [isCheckAll, setIsCheckAll] = useState(false);
+    const [isCheck, setIsCheck] = useState<any>([]);
+    const [nftsId, setNftsId] = useState<any>([])
     const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
         arr.reduce((groups, item) => {
             (groups[key(item)] ||= []).push(item);
             return groups;
         }, {} as Record<K, T[]>);
 
-    const collections = useMemo(() => props.registry && groupBy<any, any>(props.registry.ownedNfts, ((nft: any) => nft.contract.address)), [props.registry])
+    const handleSelectAll = () => {
+        setIsCheckAll(!isCheckAll);
+        setIsCheck(nftsId);
+        if (isCheckAll) {
+            setIsCheck([]);
+        }
+    };
+    const handleClick = (e: any) => {
+        const { id, checked } = e.target;
+        setIsCheck([...isCheck, id]);
+        if (!checked) {
+            setIsCheck(isCheck.filter((item: any) => item !== id));
+        }
+
+    };
+    const svgToDataURL = require('svg-to-dataurl')
+    const collections = useMemo(() => props.registry && groupBy<any, any>(props.registry.ownedNfts, ((nft: any) => nft.contract.address)), [props.registry]) //NFTs collection of all contracts grouped by contracts
+    // const NftsId = useMemo(() => props.registry && props.registry.ownedNfts.map((nft: any) => { return (parseInt(nft.id.tokenId).toString()) }), [props.registry])
+    const selectedNftsId = useCallback(() => {
+        const getNftsId = () => {
+            if (props.selectedContract != null) {
+                return (collections && collections[props.selectedContract].map((nft: any) => {
+                    return (parseInt(nft.id.tokenId).toString())
+                }))
+            }
+            else {
+                return (props.registry.ownedNfts && props.registry.ownedNfts.map((nft: any) => {
+                    return (parseInt(nft.id.tokenId).toString())
+                }))
+            }
+        }
+        setNftsId(getNftsId())
+    }, [props.registry, props.selectedContract])
+
+    useEffect(() => {
+        if (props.registry) selectedNftsId()
+    }, [props.registry, props.selectedContract])
+
     if (props.id === '1') {
         return (
-            <>
+            <div className={styles.block}>
                 {collections && Object.keys(collections).map((collectionAddress: string) => {
                     return (
                         <>
-
-                            <div className={styles.selector} key={collections[collectionAddress][0].title} onClick={() => props.onClose(collectionAddress)} >
+                            <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} >
                                 <div className={styles.frame11139}>
                                     <div className={styles.text}>
                                         {registry.find(r => r.L1_address === collectionAddress)?.name}
@@ -39,7 +78,7 @@ const Registry = (props: any) => {
                         </>
                     )
                 })}
-            </>)
+            </div>)
     }
 
     else {
@@ -52,32 +91,57 @@ const Registry = (props: any) => {
                             Select All Ids
                         </div>
                         <label className={styles.checkboxStyle}>
-                            <input type='checkbox' className={styles.checkbox}></input>
+                            <input type='checkbox' className={styles.checkbox} onClick={handleSelectAll} onChange={e => { }} checked={isCheckAll}></input>
                             <span className={styles.checkmark}></span>
                         </label>
                     </div>
                 </div>
-                {collections && Object.keys(collections).map((collectionAddress: string) => {
-                    return (
-                        <div className={styles.selector} key={collections[collectionAddress][0].title}>
-                            <div className={styles.ellipse4}>
-                                <Image src={collections[collectionAddress][0].media[0].thumbnail} style={{ borderRadius: '45px' }} layout="fill" objectFit='contain'></Image>
-                            </div>
-                            <div className={styles.frame11139}>
-                                <div className={styles.text3}>
-                                    {parseInt(collections[collectionAddress][0].id.tokenId)}
+                <div className={styles.block}>
+                    {props.selectedContract == null && props.registry.ownedNfts && props.registry.ownedNfts.map((nft: any) => {
+                        return (
+                            <div className={styles.selector} >
+                                <div className={styles.ellipse4}>
+                                    <Image src={nft.media[0].thumbnail ? nft.media[0].thumbnail : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }} layout="fill" objectFit='contain' ></Image>
+                                </div>
+                                <div className={styles.frame11139}>
+                                    <div className={styles.text3}>
+                                        {parseInt(nft.id.tokenId)}
+                                    </div>
+                                </div>
+                                <div className={styles.frame1111}>
+                                    <label className={styles.checkboxStyle}>
+                                        <input type='checkbox' className={styles.checkbox} id={parseInt(nft.id.tokenId).toString()} onChange={e => { }} onClick={handleClick} checked={isCheck.includes(parseInt(nft.id.tokenId).toString())} ></input>
+                                        <span className={styles.checkmark}></span>
+                                    </label>
                                 </div>
                             </div>
-                            <div className={styles.frame1111}>
-                                <label className={styles.checkboxStyle}>
-                                    <input type='checkbox' className={styles.checkbox}></input>
-                                    <span className={styles.checkmark}></span>
-                                </label>
-                            </div>
-                        </div>
-                    )
-                })}
-
+                        )
+                    })}
+                    {
+                        props.selectedContract != null && collections && collections[props.selectedContract].map((nft: any) => {
+                            return (
+                                <div className={styles.selector} >
+                                    <div className={styles.ellipse4}>
+                                        <Image src={nft.media[0].thumbnail ? nft.media[0].thumbnail : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }} layout='fill' objectFit='contain' ></Image >
+                                    </div>
+                                    <div className={styles.frame11139}>
+                                        <div className={styles.text3}>
+                                            {parseInt(nft.id.tokenId)}
+                                        </div>
+                                    </div>
+                                    <div className={styles.frame1111}>
+                                        <label className={styles.checkboxStyle}>
+                                            <input type='checkbox' className={styles.checkbox} id={parseInt(nft.id.tokenId).toString()} onChange={e => { }} onClick={handleClick} checked={isCheck.includes(parseInt(nft.id.tokenId).toString())} ></input>
+                                            <span className={styles.checkmark}></span>
+                                        </label>
+                                    </div>
+                                </div>)
+                        }
+                        )}
+                </div>
+                <div className={styles.bottom1}>
+                    <button className={styles.button3} onClick={() => props.onClose(isCheck.toString())} > Add {isCheck.length} TokenIDs</button>
+                </div>
             </>
         )
     }

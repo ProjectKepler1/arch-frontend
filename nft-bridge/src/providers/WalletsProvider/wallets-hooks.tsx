@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { WalletStatus } from '../../enums/WalletStatus';
 import { WalletErrorType } from '../../enums/WalletErrorType';
@@ -8,7 +8,6 @@ import { getStarknet, getStarknetWallet, resetStarknetWallet } from '../../libs'
 import { useIsL1, useTransfer } from '../TransferProvider';
 import { WalletsContext } from './wallets-context';
 import { NetworkType } from '../../enums/NetworkType';
-
 interface IAccountInfo {
   account: string,
   balance: number

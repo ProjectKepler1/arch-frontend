@@ -13,7 +13,7 @@ const initialWalletState = {
   chainName: '',
   chainId: null,
   error: null,
-  config: null
+  config: null,
 };
 
 export const initialState = {

@@ -72,7 +72,6 @@
 }
 
 .endblock1 {
-    height: 32px;
     align-self: stretch;
     flex-grow: 0;
     display: flex;
@@ -85,7 +84,6 @@
 }
 
 .subblock3 {
-    height: 22px;
     align-self: stretch;
     flex-grow: 0;
     display: flex;
@@ -97,8 +95,6 @@
 }
 
 .subText4 {
-
-    height: 22px;
     cursor: pointer;
     flex-grow: 1;
     font-family: Roboto;
@@ -114,8 +110,6 @@
 }
 
 .subText3 {
-
-    height: 20px;
     align-self: stretch;
     flex-grow: 0;
     font-family: Roboto;
@@ -130,9 +124,6 @@
 }
 
 .subText2 {
-
-    width: 205px;
-    height: 22px;
     flex-grow: 0;
     font-family: Roboto;
     font-size: 14px;
@@ -187,7 +178,6 @@
 }
 
 .subBlock1 {
-    height: 24px;
     flex-grow: 1;
     display: flex;
     flex-direction: row;
@@ -216,7 +206,6 @@
 }
 
 .bloc2 {
-    height: 172px;
     align-self: stretch;
     flex-grow: 0;
     display: flex;
@@ -240,8 +229,6 @@
 }
 
 .button3 {
-    width: 137px;
-    height: 42px;
     flex-grow: 0;
     display: flex;
     flex-direction: row;
@@ -258,8 +245,15 @@
     background-color: #57c6e4;
 }
 
+.button3:disabled,
+.button[disabled] {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
 .bottom1 {
-    height: 42px;
     align-self: stretch;
     flex-grow: 0;
     display: flex;
@@ -289,7 +283,6 @@
 }
 
 .text2 {
-    height: 26px;
     flex-grow: 1;
     font-family: Rajdhani;
     font-size: 18px;
@@ -303,8 +296,6 @@
 }
 
 .text1 {
-    width: 128px;
-    height: 26px;
     flex-grow: 0;
     font-family: Rajdhani;
     font-size: 18px;
@@ -318,8 +309,6 @@
 }
 
 .button1 {
-    width: 140px;
-    height: 32px;
     flex-grow: 0;
     display: flex;
     flex-direction: row;
@@ -334,7 +323,6 @@
 }
 
 .bloc1 {
-    height: 122px;
     align-self: stretch;
     flex-grow: 0;
     display: flex;
@@ -346,8 +334,6 @@
 }
 
 .subText {
-    width: 223.9px;
-    height: 20px;
     flex-grow: 0;
     margin: 3px 0 3px 4.1px;
     font-family: Roboto;
@@ -363,8 +349,6 @@
 }
 
 .text {
-    width: 223.9px;
-    height: 26px;
     flex-grow: 0;
     margin: 0 4.1px 0 0;
     font-family: Rajdhani;

@@ -9,6 +9,5 @@ export const WalletsContext = createContext({
   connectWalletL1: (config: any) => { },
   connectWalletL2: (config: any) => { },
   resetWalletL1: () => { },
-  resetWalletL2: () => { }
-
+  resetWalletL2: () => { },
 });

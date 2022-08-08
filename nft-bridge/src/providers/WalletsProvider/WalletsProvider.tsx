@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState, useCallback } from 'react';
 import { useWallet } from 'use-wallet';
-
 import { WalletStatus } from '../../enums';
 import { calcAccountHash } from '../../utils/wallet';
 import { WalletsContext } from './wallets-context';
-import { useStarknetWallet } from './wallets-hooks';
+import { accountInfo, useStarknetWallet } from './wallets-hooks';
 import { actions, initialState, reducer } from './wallets-reducer';
+import { getNFTsForOwnerFilteredByCollection } from "../../nft-api/Alchemy"
+import registry from '../../../registry.json'
 
 export const WalletsProvider = ({ children }: { children: any }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -85,14 +86,13 @@ export const WalletsProvider = ({ children }: { children: any }) => {
       payload
     });
   };
-
   const context = {
     ...state,
     accountHash,
     connectWalletL1,
     connectWalletL2,
     resetWalletL1,
-    resetWalletL2
+    resetWalletL2,
   };
 
   return <WalletsContext.Provider value={context}>{children}</WalletsContext.Provider>;
