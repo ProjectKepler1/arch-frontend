@@ -1,2 +1,2 @@
-export * from './Bridge/Bridge';
-export * from './Login/Login';
+export * from '../components/Bridge/Bridge';
+export * from '../components/Login/Login';

@@ -22,6 +22,7 @@ export const accountInfo: Record<string, IAccountInfo> = {
     balance: 0
   }
 }
+
 export const useWallets = () => {
   const wallets = useContext(WalletsContext);
   const { isL1 } = useTransfer();

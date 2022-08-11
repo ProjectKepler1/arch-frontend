@@ -6,11 +6,13 @@ import { accountInfo, useL1Wallet } from '../../providers/WalletsProvider'
 import { promiseHandler } from '../../utils'
 import registry from '../../../registry.json'
 import Image from 'next/image'
-import { StyledStepper } from '@chakra-ui/react'
+import { useNFTCollection, useNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
 const Registry = (props: any) => {
     const [isCheckAll, setIsCheckAll] = useState(false);
     const [isCheck, setIsCheck] = useState<any>([]);
     const [nftsId, setNftsId] = useState<any>([])
+    const bridgeregistryGroupBy = useNFTCollectionGroupBy()
+    const bridgeregistry = useNFTCollection()
     const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
         arr.reduce((groups, item) => {
             (groups[key(item)] ||= []).push(item);
@@ -33,32 +35,31 @@ const Registry = (props: any) => {
 
     };
     const svgToDataURL = require('svg-to-dataurl')
-    const collections = useMemo(() => props.registry && groupBy<any, any>(props.registry.ownedNfts, ((nft: any) => nft.contract.address)), [props.registry]) //NFTs collection of all contracts grouped by contracts
     // const NftsId = useMemo(() => props.registry && props.registry.ownedNfts.map((nft: any) => { return (parseInt(nft.id.tokenId).toString()) }), [props.registry])
     const selectedNftsId = useCallback(() => {
         const getNftsId = () => {
             if (props.selectedContract != null) {
-                return (collections && collections[props.selectedContract].map((nft: any) => {
+                return (bridgeregistryGroupBy && bridgeregistryGroupBy[props.selectedContract].map((nft: any) => {
                     return (parseInt(nft.id.tokenId).toString())
                 }))
             }
             else {
-                return (props.registry.ownedNfts && props.registry.ownedNfts.map((nft: any) => {
+                return (bridgeregistry.ownedNfts && bridgeregistry.ownedNfts.map((nft: any) => {
                     return (parseInt(nft.id.tokenId).toString())
                 }))
             }
         }
         setNftsId(getNftsId())
-    }, [props.registry, props.selectedContract])
+    }, [bridgeregistry, props.selectedContract])
 
     useEffect(() => {
-        if (props.registry) selectedNftsId()
-    }, [props.registry, props.selectedContract])
+        selectedNftsId()
+    }, [bridgeregistry, props.selectedContract])
 
     if (props.id === '1') {
         return (
             <div className={styles.block}>
-                {collections && Object.keys(collections).map((collectionAddress: string) => {
+                {bridgeregistryGroupBy && Object.keys(bridgeregistryGroupBy).map((collectionAddress: string) => {
                     return (
                         <>
                             <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} >
@@ -72,7 +73,7 @@ const Registry = (props: any) => {
                                     </div>
                                 </div>
                                 <div className={styles.span}>
-                                    {collections[collectionAddress].length}
+                                    {bridgeregistryGroupBy[collectionAddress].length}
                                 </div>
                             </div>
                         </>
@@ -97,11 +98,11 @@ const Registry = (props: any) => {
                     </div>
                 </div>
                 <div className={styles.block}>
-                    {props.selectedContract == null && props.registry.ownedNfts && props.registry.ownedNfts.map((nft: any) => {
+                    {props.selectedContract == null && bridgeregistry.ownedNfts && bridgeregistry.ownedNfts.map((nft: any) => {
                         return (
                             <div className={styles.selector} >
                                 <div className={styles.ellipse4}>
-                                    <Image src={nft.media[0].thumbnail ? nft.media[0].thumbnail : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }} layout="fill" objectFit='contain' ></Image>
+                                    <img className={styles.ellipse4} src={nft.media[0].thumbnail ? nft.media[0].thumbnail : nft.media[0].gateway ? nft.media[0].gateway : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }} ></img>
                                 </div>
                                 <div className={styles.frame11139}>
                                     <div className={styles.text3}>
@@ -118,11 +119,11 @@ const Registry = (props: any) => {
                         )
                     })}
                     {
-                        props.selectedContract != null && collections && collections[props.selectedContract].map((nft: any) => {
+                        props.selectedContract != null && bridgeregistryGroupBy && bridgeregistryGroupBy[props.selectedContract].map((nft: any) => {
                             return (
                                 <div className={styles.selector} >
                                     <div className={styles.ellipse4}>
-                                        <Image src={nft.media[0].thumbnail ? nft.media[0].thumbnail : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }} layout='fill' objectFit='contain' ></Image >
+                                        <img className={styles.ellipse4} src={nft.media[0].thumbnail ? nft.media[0].thumbnail : nft.media[0].gateway ? nft.media[0].gateway : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }}></img >
                                     </div>
                                     <div className={styles.frame11139}>
                                         <div className={styles.text3}>
@@ -140,7 +141,7 @@ const Registry = (props: any) => {
                         )}
                 </div>
                 <div className={styles.bottom1}>
-                    <button className={styles.button3} onClick={() => props.onClose(isCheck.toString())} > Add {isCheck.length} TokenIDs</button>
+                    <button className={styles.button3} onClick={() => props.onClose(isCheck)} > Add {isCheck.length} TokenIDs</button>
                 </div>
             </>
         )

@@ -12,20 +12,18 @@ import { evaluate } from '../../utils/object';
 import { isChrome } from '../../utils/browser';
 import Image from 'next/image';
 import { parseFromDecimals, promiseHandler, truncateAddress, truncateAddress2 } from '../../utils';
-import WalletBalance from '../../components/WalletBalance';
 import { accountInfo, useLoginWallet, useWalletsStatus } from '../../providers/WalletsProvider';
 const AUTO_CONNECT_TIMEOUT_DURATION = 100;
 import styles from './Login.module.scss'
 import starknetLogo from '../../assets/svg/logos/starknet.png'
 import ethLogo from '../../assets/svg/logos/eth.png'
-import ConnectWallet from '../../components/ConnectWallet/ConnectWallet';
+import ConnectWallet from '../ConnectWallet/ConnectWallet';
 import MetamaskLogo from '../../assets/svg/wallets/metamask.svg'
 import BraavosLogo from '../../assets/svg/wallets/Braavos.svg'
 import ArgentXLogo from '../../assets/svg/wallets/ArgentX.svg'
 import logInLogo from '../../assets/svg/vector/log-in.svg'
 import { web3 } from '../../libs';
-
-export const Login = () => {
+export const Login = ({ confirmation }: { confirmation?: boolean }) => {
     const [trackLoginScreen, trackDownloadClick, trackWalletClick, trackLoginError] =
         useLoginTracking();
     const { autoConnect, supportedL1ChainId } = useEnvs();
@@ -124,20 +122,24 @@ export const Login = () => {
     const ConnectButton = (props: any) => {
         if (props.name === 'Ethereum') {
             return (
-                <div className={network === NetworkType.L1 ? styles.walletConnectButton1 : styles.disabledConnectButton1} onClick={handleClickEth}>
-                    <Image src={MetamaskLogo} className={styles.image6}></Image>
-                    <span className={styles.connect}>Connect</span>
+                <div className={network === NetworkType.L1 ? styles.walletConnectButton : styles.disabledConnectButton} onClick={handleClickEth}>
+                    <div style={{ width: "24px", height: '75%', justifyContent: 'center', alignItems: 'center' }}>
+                        <Image src={MetamaskLogo}></Image>
+                    </div>
+                    <span className={styles.connect}>{props.status === WalletStatus.CONNECTED ? "Connected" : "Connect"}</span>
                 </div>
             )
         }
         else {
             return (
-                <div className={network === NetworkType.L2 ? styles.walletConnectButton2 : styles.disabledConnectButton2} onClick={handleClickStark} >
-                    <div style={{ width: "24px", height: '75%', justifyContent: 'center', alignItems: 'center' }}>
-                        <Image src={ArgentXLogo} className={styles.image6}></Image>
-                    </div>
-                    <div style={{ width: "24px", height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                        <Image src={BraavosLogo} className={styles.image6}></Image>
+                <div className={network === NetworkType.L2 ? styles.walletConnectButton : styles.disabledConnectButton} onClick={handleClickStark} >
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: 'center' }}>
+                        <div style={{ flex: "50%", width: "100%", padding: "2px" }}>
+                            <Image src={ArgentXLogo} objectFit="contain" ></Image>
+                        </div>
+                        <div style={{ flex: "50%", width: "24px", padding: "2px" }}>
+                            <Image src={BraavosLogo} objectFit="contain"></Image>
+                        </div>
                     </div>
                     <span className={styles.connect}>{props.status === WalletStatus.CONNECTED ? "Connected" : "Connect"}</span>
                     {/* <Image src={logInLogo} className={styles.login}></Image> */}
@@ -169,8 +171,5 @@ export const Login = () => {
             </ConnectWallet>
 
         </div>
-
-
-
     );
 };
