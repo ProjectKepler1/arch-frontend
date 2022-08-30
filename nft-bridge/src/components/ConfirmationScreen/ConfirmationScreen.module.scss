@@ -1,6 +1,5 @@
 .frame11144 {
     width: 468px;
-    height: 610px;
     flex-grow: 0;
     display: flex;
     flex-direction: column;
@@ -14,8 +13,31 @@
 
 }
 
+
+.image11 {
+    width: 72px;
+    height: 72px;
+    flex-grow: 0;
+    border-radius: 4px;
+    border-color: #444652;
+}
+
+
+.text3 {
+    flex-grow: 0;
+    font-family: Roboto;
+    font-size: 20px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.4;
+    letter-spacing: normal;
+    text-align: center;
+    color: #6b7082;
+
+}
+
 .frame11141 {
-    height: 24px;
     align-self: stretch;
     flex-grow: 0;
     display: flex;
@@ -23,6 +45,12 @@
     justify-content: space-between;
     align-items: stretch;
     padding: 0 24px;
+}
+
+.frame11146 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
 }
 
 .text1 {
@@ -62,16 +90,35 @@
 }
 
 .frame11145 {
+    width: 100%;
+    height: 100px;
     align-self: stretch;
+    overflow: scroll;
+    scroll-behavior: auto;
     flex-grow: 0;
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-start;
     gap: 16px;
     margin: 0px 0 15px;
     padding: 0 24px;
+}
 
+.frame11145bis {
+    width: 100%;
+    align-self: stretch;
+    scroll-behavior: auto;
+    flex-grow: 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 16px;
+    margin: 0px 0 15px;
+    padding: 0 24px;
 }
 
 .image13 {

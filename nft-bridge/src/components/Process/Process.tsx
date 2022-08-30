@@ -27,11 +27,7 @@ const Process = () => {
     const context = useContext(NftContext)
     let maxInput = 7
     let x = 2
-    const addInputField = () => {
-        if (x < maxInput) {
-            x++;
-        }
-    }
+
     // const getNFTs = useCallback(() => {
     //     const countNFTs = async (collectionAddresses: string[], owner: string) => {
     //         const firstFilteredPage = await getNFTsForOwnerFilteredByCollection('0x04FD71a7c80dee02cec42cA7C6941D0940CBf55f', collectionAddresses)
@@ -81,13 +77,6 @@ const Process = () => {
                     </label>
                 </div>
                 <HandleCheck contract={contract} tokenId={tokenId} change={change} change1={change1} returnContract={(value: any) => setContract(value)} returnTokenId={(value: any) => setTokenId(value)} id='1' />
-                <div className={styles.endblock1}>
-                    <div className={styles.subBlock1}>
-                        <div className={styles.subText2}>Verify Bridge Registry to Proceed</div>
-                        <Image src={question} style={{ cursor: 'pointer' }}></Image>
-                    </div>
-                    <button className={styles.button1}>Check Verification</button>
-                </div>
             </div>
             <div className={styles.bloc2}>
                 <div className={styles.header1}>

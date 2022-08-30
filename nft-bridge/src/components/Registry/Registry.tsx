@@ -13,12 +13,6 @@ const Registry = (props: any) => {
     const [nftsId, setNftsId] = useState<any>([])
     const bridgeregistryGroupBy = useNFTCollectionGroupBy()
     const bridgeregistry = useNFTCollection()
-    const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
-        arr.reduce((groups, item) => {
-            (groups[key(item)] ||= []).push(item);
-            return groups;
-        }, {} as Record<K, T[]>);
-
     const handleSelectAll = () => {
         setIsCheckAll(!isCheckAll);
         setIsCheck(nftsId);

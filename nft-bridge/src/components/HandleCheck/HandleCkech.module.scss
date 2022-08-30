@@ -20,6 +20,70 @@
     }
 }
 
+.subText4 {
+    cursor: pointer;
+    flex-grow: 1;
+    font-family: Roboto;
+    font-size: 16px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.57;
+    letter-spacing: normal;
+    text-align: left;
+    color: #8edcec;
+    background-color: #1a1f2e;
+    border: none;
+}
+
+.endblock1 {
+    align-self: stretch;
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    padding: 0;
+    background-color: #1a1f2e;
+}
+
+.button1 {
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    background-color: #57c6e4;
+    color: #fff;
+    font-family: Rajdhani;
+}
+
+.subText2 {
+    flex-grow: 0;
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.57;
+    letter-spacing: normal;
+    text-align: left;
+    color: #6b7082;
+}
+
+.subBlock1 {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+}
+
 .input1 {
     align-self: stretch;
     flex-grow: 0;

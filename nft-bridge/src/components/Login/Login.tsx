@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { TransactionStatus } from '@starkware-industries/commons-js-enums';
 import { ActionType } from '../../enums/ActionType';
 import { ChainInfo } from '../../enums/ChainType';
+import { ChainType } from '../../enums/ChainType';
 import { LoginErrorType } from '../../enums/LoginErrorType'
 import { NetworkType } from '../../enums/NetworkType';
 import { WalletErrorType } from '../../enums/WalletErrorType';
@@ -11,7 +13,7 @@ import { useWalletHandlerProvider } from '../../hooks/useWalletHandlerProvider';
 import { evaluate } from '../../utils/object';
 import { isChrome } from '../../utils/browser';
 import Image from 'next/image';
-import { parseFromDecimals, promiseHandler, truncateAddress, truncateAddress2 } from '../../utils';
+import { parseFromDecimals, parseToUint256, promiseHandler, truncateAddress, truncateAddress2 } from '../../utils';
 import { accountInfo, useLoginWallet, useWalletsStatus } from '../../providers/WalletsProvider';
 const AUTO_CONNECT_TIMEOUT_DURATION = 100;
 import styles from './Login.module.scss'
@@ -23,17 +25,22 @@ import BraavosLogo from '../../assets/svg/wallets/Braavos.svg'
 import ArgentXLogo from '../../assets/svg/wallets/ArgentX.svg'
 import logInLogo from '../../assets/svg/vector/log-in.svg'
 import { web3 } from '../../libs';
+import { callL2Contract } from '../../utils/starknet';
+import { parseFromUint256 } from '../../utils';
+import { useL2TokenContract } from '../../hooks/useContract';
+import Tokens from '../../config/tokens';
 export const Login = ({ confirmation }: { confirmation?: boolean }) => {
     const [trackLoginScreen, trackDownloadClick, trackWalletClick, trackLoginError] =
         useLoginTracking();
-    const { autoConnect, supportedL1ChainId } = useEnvs();
+    const { autoConnect, supportedL1ChainId, supportedL2ChainId } = useEnvs();
     const [selectedWalletName, setSelectedWalletName] = useState('');
     const [error, setError] = useState<any>(null);
     const [network, setNetwork] = useState(NetworkType.L1);
     const { statusL1, statusL2 } = useWalletsStatus();
-    const [EthBalanceMeta, setEthBalanceMeta] = useState(0)
-    const [EthBalanceStark, setEthBalanceStark] = useState(0)
+    const [EthBalanceMeta, setEthBalanceMeta] = useState<number | null>(null)
+    const [EthBalanceStark, setEthBalanceStark] = useState<number | null>(null)
     const { walletAccount, walletError, walletStatus, connectWallet } = useLoginWallet(network);
+    const getL2TokenContract = useL2TokenContract();
     const walletHandlers = useWalletHandlerProvider(network);
     useEffect(() => {
         trackLoginScreen();
@@ -82,12 +89,44 @@ export const Login = ({ confirmation }: { confirmation?: boolean }) => {
 
 
     const EthBalance = useCallback(async () => {
-        const [res, error] = await promiseHandler(web3.eth.getBalance(accountInfo.L1.account))
+        if (accountInfo.L1.account) {
+
+            const [res, error] = await promiseHandler(web3.eth.getBalance(accountInfo.L1.account))
+            if (error) {
+                return Promise.reject(error);
+            }
+            console.log(res)
+            setEthBalanceMeta(parseFloat((parseFloat(res) / 1000000000000000000).toFixed(7)));
+        }
+    }, [])
+
+    const L2Balance = useCallback(async () => {
+
+        const account = accountInfo.L2.account
+        const tokenAddress = Tokens.L2.ETH.tokenAddress[supportedL2ChainId]
+        const contract = getL2TokenContract(tokenAddress);
+
+        const [{ balance }, error] = await promiseHandler(
+            callL2Contract(contract, 'balanceOf', account, {
+                blockIdentifier: TransactionStatus.PENDING.toLowerCase()
+            })
+        );
         if (error) {
             return Promise.reject(error);
         }
-        setEthBalanceMeta(res);
-    }, [])
+        console.log(parseFromUint256(balance))
+        setEthBalanceStark(parseFloat(parseFromUint256(balance).toFixed(7)))
+    },
+        [getL2TokenContract]
+    );
+
+    useEffect(() => {
+        EthBalance()
+    }, [accountInfo.L1.account, setEthBalanceMeta])
+
+    useEffect(() => {
+        L2Balance()
+    }, [accountInfo.L2.account, setEthBalanceStark])
 
     const handleWalletError = (error: any) => {
         if (error.name === WalletErrorType.CHAIN_UNSUPPORTED_ERROR) {
@@ -165,7 +204,7 @@ export const Login = ({ confirmation }: { confirmation?: boolean }) => {
                 logoURL={starknetLogo}
                 type="mainnet"
                 address={statusL2 === WalletStatus.CONNECTED ? truncateAddress(accountInfo.L2.account) : "-"}
-                balance={statusL2 === WalletStatus.CONNECTED ? '0.000' : '-'}
+                balance={statusL2 === WalletStatus.CONNECTED ? EthBalanceStark : '-'}
                 error={network === NetworkType.L2 ? error?.message : null}>
                 <ConnectButton name={"StarkNet"} status={statusL2} />
             </ConnectWallet>
