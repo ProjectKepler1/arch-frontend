@@ -2,6 +2,7 @@ import { getLogger, getLogLevel, setLogLevel } from './logger';
 
 import { encode, number, uint256 } from 'starknet'
 import { utils } from 'ethers'
+import { ethers } from 'ethers';
 
 export * from './browser';
 export * from './logger';
@@ -60,4 +61,15 @@ export const wait = (timeout = 1000) => {
         }, timeout)
     )
 }
+export const getHigherGWEI = async (library: any) => {
+    const price = (await library.getGasPrice()) * 2;
+
+    return price;
+};
+
+export const calculateGasMargin = (value: any) => {
+    return value
+        .mul(ethers.BigNumber.from(10000).add(ethers.BigNumber.from(1000)))
+        .div(ethers.BigNumber.from(10000));
+};
 

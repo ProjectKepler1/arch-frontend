@@ -8,6 +8,7 @@ export const supportedL1ChainId = Number(process.env.NEXT_PUBLIC_REACT_APP_SUPPO
 export const supportedL2ChainId =
   supportedL1ChainId === ChainType.L1.GOERLI ? ChainType.L2.GOERLI : ChainType.L2.MAIN;
 export const starknetContractAddress = process.env.NEXT_PUBLIC_REACT_APP_STARKNET_CONTRACT_ADDRESS;
+export const L1BridgeContractAddress = process.env.NEXT_PUBLIC_REACT_APP_L1_BRIDGE_CONTRACT_ADDRESS;
 export const etherscanUrl = process.env.NEXT_PUBLIC_REACT_APP_ETHERSCAN_URL;
 export const etherscanTxUrl = (tx: any) => evaluate(`${etherscanUrl}/tx/{{tx}}`, { tx });
 export const etherscanAccountUrl = (address: any) =>

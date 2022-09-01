@@ -13,18 +13,20 @@ import { getNFTsForOwnerFilteredByCollection } from '../../nft-api/Alchemy'
 import { truncateAddress } from '../../utils'
 import Link from 'next/link'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
+
 const Process = () => {
-    const [inputState, setInputState] = useState(false)
-    const [errorState, setErrorState] = useState(false)
-    const [show, setShow] = useState(false)
-    const [contract, setContract] = useState(null)
+    const [inputState, setInputState] = useState<boolean>(false)
+    const [errorState, setErrorState] = useState<boolean>(false)
+    const [show, setShow] = useState<boolean>(false)
+    const [contract, setContract] = useState<string | null>(null)
     const [tokenId, setTokenId] = useState<string[]>([])
     // const [bridgeregistry, setBridgeRegistry] = useState<any>()
-    const [change, setChange] = useState(false)
-    const [change1, setChange1] = useState(false)
+    const [change, setChange] = useState<boolean>(false)
+    const [change1, setChange1] = useState<boolean>(false)
     const starknetAddress = accountInfo.L2.account
     const metaAddress = accountInfo.L1.account
     const context = useContext(NftContext)
+    const [receivingAddress1, setReceivingAddress1] = useState<string | null>(null)
     let maxInput = 7
     let x = 2
 
@@ -56,6 +58,16 @@ const Process = () => {
     // useEffect(() => {
     //     if (registry) getNFTs()
     // }, [registry])
+
+    const saveChange = () => {
+        context.setTokenIds(tokenId);
+        context.setSelectedContractAddress(contract)
+        if (!receivingAddress1)
+            context.setReceivingAddress(starknetAddress)
+        else
+            context.setReceivingAddress(receivingAddress1)
+
+    }
 
     return (
         <div className={styles.frame7}>
@@ -100,7 +112,7 @@ const Process = () => {
                     <div className={styles.subText4} onClick={handleInputState}>Use my StarkNet Address</div>
                 </div>
                 <InputError state={errorState} error="Please connect your Starknet wallet first" />
-                <ModifiedInput value={truncateAddress(starknetAddress)} state={inputState} />
+                <ModifiedInput value={truncateAddress(starknetAddress)} state={inputState} returnAddress={(value: any) => { setReceivingAddress1(value) }} />
             </div>
             <div className={styles.bottom1}>
                 {
@@ -118,7 +130,7 @@ const Process = () => {
                 {
                     contract != null && tokenId != null &&
                     <Link href="/confirmation">
-                        <button className={styles.button3} onClick={() => { context.setTokenIds(tokenId); context.setSelectedContractAddress(contract) }}>Continue</button>
+                        <button className={styles.button3} onClick={saveChange}>Continue</button>
                     </Link>
                 }
             </div>

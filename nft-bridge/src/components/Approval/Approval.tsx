@@ -1,4 +1,3 @@
-import { StylesProvider } from '@chakra-ui/system'
 import React from 'react'
 import styles from "./Approval.module.scss"
 import TransactionStatus from '../TransactionStatus/TransactionStatus'

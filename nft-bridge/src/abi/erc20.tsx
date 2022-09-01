@@ -1,4 +1,4 @@
-[
+export const L2_ERC20_ABI =[
     {
         "members": [
             {

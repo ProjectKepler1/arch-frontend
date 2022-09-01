@@ -31,6 +31,7 @@
 		"@splitbee/web": "^0.3.0",
 		"@starkware-industries/commons-js-enums": "^1.0.1",
 		"@starkware-industries/commons-js-libs": "^1.1.0",
+		"@web3-react/core": "^6.1.9",
 		"axios": "^0.27.2",
 		"bignumber.js": "9.0.1",
 		"eth-price": "^0.1.5",

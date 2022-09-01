@@ -12,6 +12,7 @@ export const NftProvider = ({ children }: { children: any }) => {
     const [bridgeregistry, setBridgeRegistry] = useState<any>()
     const metaAddress = accountInfo.L1.account
     const [tokenIds, setTokenIds] = useState<string[]>([])
+    const [receivingAddress, setReceivingAddress] = useState<string>('')
     const [selectedContractAddress, setSelectedContractAddress] = useState('')
     const getNFTs = useCallback(() => {
         const getCollectionNFTs = async (collectionAddresses: string[], owner: string) => {
@@ -33,7 +34,9 @@ export const NftProvider = ({ children }: { children: any }) => {
         tokenIds,
         setTokenIds,
         selectedContractAddress,
-        setSelectedContractAddress
+        setSelectedContractAddress,
+        receivingAddress,
+        setReceivingAddress
     }
     return (
         <NftContext.Provider value={context}>

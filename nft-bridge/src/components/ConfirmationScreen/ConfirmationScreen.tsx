@@ -4,8 +4,8 @@ import { accountInfo } from "../../providers/WalletsProvider"
 import { truncateAddress2, truncateAddress } from "../../utils"
 import copy from '../../assets/svg/vector/copy.svg'
 import Image from "next/image"
-import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds } from "../../providers/NftProvider/nft-hooks"
-import { supportedLiquidityProviders } from "../../config/envs"
+import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds, useReceivingAddress } from "../../providers/NftProvider/nft-hooks"
+import { L1BridgeContractAddress, supportedLiquidityProviders } from "../../config/envs"
 import ethLogo from "../../assets/svg/logos/eth.png"
 import Link from 'next/link'
 import { web3 } from '../../libs';
@@ -15,6 +15,7 @@ import { promiseHandler } from "../../utils"
 const ConfirmationScreen = () => {
     const tokenIds = useTokenIds()
     const contractAddress = useSelectedContractAddress()
+    const receivingAddress = useReceivingAddress()
     const tracker = useCollectionTracker(contractAddress)
     const [showId, setShowId] = useState(false)
     const [showImage, setShowImage] = useState(false)
@@ -26,10 +27,9 @@ const ConfirmationScreen = () => {
     const setShowImages = () => {
         setShowImage(!showImage)
     }
-
     const computeFee = async () => {
         const estimateGas = await web3.eth.estimateGas({
-            to: "0x6CbC867Ec364B990Cf5FEB8Ef5547FC1A9Fed02F",
+            to: L1BridgeContractAddress,
             data: data
         })
         const gasPrice = await web3.eth.getGasPrice()
@@ -79,9 +79,9 @@ const ConfirmationScreen = () => {
                 </div>
                 <div className={styles.block}>
                     <div className={styles.address1}>
-                        {truncateAddress(accountInfo.L2.account)}
+                        {truncateAddress(receivingAddress)}
                     </div>
-                    <Image src={copy} onClick={() => navigator.clipboard.writeText(accountInfo.L2.account)} />
+                    <Image src={copy} onClick={() => navigator.clipboard.writeText(receivingAddress)} />
                 </div>
             </div>
             <div className={styles.frame11141}>

@@ -42,6 +42,11 @@ export const useSelectedContractAddress = () => {
     return context.selectedContractAddress
 }
 
+export const useReceivingAddress = () => {
+    const context = useContext(NftContext)
+    return context.receivingAddress
+}
+
 export const useImageForIds = (contractAddress: string, tokenId: string) => {
     const svgToDataURL = require('svg-to-dataurl')
     const groupByCollection = useNFTCollectionGroupBy()
