@@ -95,7 +95,6 @@ export const Login = ({ confirmation }: { confirmation?: boolean }) => {
             if (error) {
                 return Promise.reject(error);
             }
-            console.log(res)
             setEthBalanceMeta(parseFloat((parseFloat(res) / 1000000000000000000).toFixed(7)));
         }
     }, [])

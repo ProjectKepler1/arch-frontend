@@ -14,11 +14,11 @@ export const NftProvider = ({ children }: { children: any }) => {
     const [tokenIds, setTokenIds] = useState<string[]>([])
     const [receivingAddress, setReceivingAddress] = useState<string>('')
     const [selectedContractAddress, setSelectedContractAddress] = useState('')
+    const [sendingAddress, setSendingAddress] = useState()
     const getNFTs = useCallback(() => {
         const getCollectionNFTs = async (collectionAddresses: string[], owner: string) => {
             const firstFilteredPage = await getNFTsForOwnerFilteredByCollection('0x04FD71a7c80dee02cec42cA7C6941D0940CBf55f', collectionAddresses)
             setBridgeRegistry(firstFilteredPage)
-            console.log("done")
         }
         if (registry) {
             getCollectionNFTs(registry.map(reg => reg.L1_address), metaAddress)

@@ -40,7 +40,7 @@ const BridgeDirectionOption = (props: any) => {
                 </div>
             </div>
             <div className={props.index === 0 ? styles.walletConnect : styles.argentXorBraavos}>{selectedOptions[4]}</div>
-        </div>
+        </div >
     )
 }
 

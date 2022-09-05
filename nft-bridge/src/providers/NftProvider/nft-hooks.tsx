@@ -83,3 +83,9 @@ export const useIsTokenInCollection2 = (collection: any, tokenId: string, contra
     const condition = (element: any) => tokenId == parseInt(element.id.tokenId).toString()
     return collection[contract].some(condition)
 }
+
+export const useBridgeDireciton = () => {
+    const context = useContext(NftContext)
+    return context.BridgeDirection
+}
+

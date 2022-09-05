@@ -3,6 +3,7 @@ import { getLogger, getLogLevel, setLogLevel } from './logger';
 import { encode, number, uint256 } from 'starknet'
 import { utils } from 'ethers'
 import { ethers } from 'ethers';
+import { web3 } from '../libs';
 
 export * from './browser';
 export * from './logger';
@@ -61,8 +62,9 @@ export const wait = (timeout = 1000) => {
         }, timeout)
     )
 }
+
 export const getHigherGWEI = async (library: any) => {
-    const price = (await library.getGasPrice()) * 2;
+    const price = (await web3.eth.getGasPrice()) * 2;
 
     return price;
 };
