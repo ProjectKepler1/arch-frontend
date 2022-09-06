@@ -29,7 +29,7 @@ import { callL2Contract } from '../../utils/starknet';
 import { parseFromUint256 } from '../../utils';
 import { useL2TokenContract } from '../../hooks/useContract';
 import Tokens from '../../config/tokens';
-export const Login = ({ confirmation }: { confirmation?: boolean }) => {
+export const Login = (props: any) => {
     const [trackLoginScreen, trackDownloadClick, trackWalletClick, trackLoginError] =
         useLoginTracking();
     const { autoConnect, supportedL1ChainId, supportedL2ChainId } = useEnvs();
@@ -113,7 +113,6 @@ export const Login = ({ confirmation }: { confirmation?: boolean }) => {
         if (error) {
             return Promise.reject(error);
         }
-        console.log(parseFromUint256(balance))
         setEthBalanceStark(parseFloat(parseFromUint256(balance).toFixed(7)))
     },
         [getL2TokenContract]
@@ -125,6 +124,7 @@ export const Login = ({ confirmation }: { confirmation?: boolean }) => {
 
     useEffect(() => {
         L2Balance()
+        props.actualisation()
     }, [accountInfo.L2.account, setEthBalanceStark])
 
     const handleWalletError = (error: any) => {

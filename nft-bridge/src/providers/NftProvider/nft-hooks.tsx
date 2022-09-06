@@ -4,11 +4,15 @@ export const useNFTCollection = () => {
     const context = useContext(NftContext)
     return (context.bridgeregistry)
 }
+export const useStarknetNFTCollection = () => {
+    const context = useContext(NftContext)
+    return context.starknetBridgeregistry
+}
 
 
 export const useNFTCollectionGroupBy = () => {
     const context = useContext(NftContext)
-    const collection = context.bridgeregistry
+    const collection = context.bridgeregistry;
     const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
         arr.reduce((groups, item) => {
             (groups[key(item)] ||= []).push(item);
@@ -29,9 +33,42 @@ export const useNFTCollectionGroupByWithCont = (context: any) => {
     return (groupByCollection)
 }
 
+
+export const useStarknetNFTCollectionGroupBy = () => {
+    const context = useContext(NftContext)
+    const collection = context.starknetBridgeregistry;
+    let groupByCollection: Record<any, any[]> | null = null
+    const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
+        arr.reduce((groups, item) => {
+            (groups[key(item)] ||= []).push(item);
+            return groups;
+        }, {} as Record<K, T[]>);
+    if (collection)
+        groupByCollection = groupBy<any, any>(collection[0].assets, ((nft: any) => nft.contract_address))
+    return (groupByCollection)
+
+}
+
+export const useStarknetNFTCollectionGroupByWithCont = (context: any) => {
+    const collection = context.starknetBridgeregistry
+    const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
+        arr.reduce((groups, item) => {
+            (groups[key(item)] ||= []).push(item);
+            return groups;
+        }, {} as Record<K, T[]>);
+    const groupByCollection = groupBy<any, any>(collection.assets, ((nft: any) => nft.contract_address))
+    return (groupByCollection)
+}
+
 export const useCollectionTracker = (collectionAddress: string) => {
     const groupByCollection = useNFTCollectionGroupBy()
     return (groupByCollection[collectionAddress][0].contractMetadata ? groupByCollection[collectionAddress][0].contractMetadata.symbol : groupByCollection[collectionAddress][0].title)
+}
+
+export const useStarknetCollectionTracker = (collectionAddress: string) => {
+    const groupByCollection = useStarknetNFTCollectionGroupBy()
+    if (groupByCollection)
+        return (groupByCollection[collectionAddress][0].contract.symbol)
 }
 export const useTokenIds = () => {
     const context = useContext(NftContext)
@@ -57,6 +94,19 @@ export const useImageForIds = (contractAddress: string, tokenId: string) => {
         }
     })
     return (image)
+
+}
+export const useStarknetImageForIds = (contractAddress: string, tokenId: string) => {
+    const groupByCollection = useStarknetNFTCollectionGroupBy()
+    const svgToDataURL = require('svg-to-dataurl')
+    let image: string = ""
+    if (groupByCollection)
+        groupByCollection[contractAddress].map((nft: any) => {
+            if (tokenId == nft.token_id) {
+                image = nft.image_uri ? svgToDataURL(nft.image_uri.replace('data:image/svg+xml,', "")) : nft.image_url_copy
+            }
+        })
+    return (image)
 }
 
 export const useisCollectioninRegistry = (contract: string) => {
@@ -65,27 +115,33 @@ export const useisCollectioninRegistry = (contract: string) => {
     return (array.includes(contract))
 }
 
-
-//This function can be improved, without using if loop.
-export const useIsTokenIdinCollection = (tokenId: string, contract: string) => {
+export const useIsStarknetCollectioninRegistry = (contract: string) => {
     const groupByCollection = useNFTCollectionGroupBy()
-    if (useisCollectioninRegistry(contract)) {
-        groupByCollection[contract].map((nft: any) => {
-            if (tokenId == (parseInt(nft.id.tokenId).toString())) {
-                return (true)
-            }
-        })
-        return (false)
+    if (groupByCollection) {
+        const array = Object.keys(groupByCollection)
+        return (array.includes(contract))
     }
 }
+
+
+
 
 export const useIsTokenInCollection2 = (collection: any, tokenId: string, contract: string) => {
     const condition = (element: any) => tokenId == parseInt(element.id.tokenId).toString()
     return collection[contract].some(condition)
 }
 
-export const useBridgeDireciton = () => {
-    const context = useContext(NftContext)
-    return context.BridgeDirection
+export const useIsTokenInStarkCollection2 = (collection: any, tokenId: string, contract: string) => {
+    const condition = (element: any) => tokenId == element.token_id
+    return collection[contract].some(condition)
 }
 
+export const useSetBridgeDirection = (value: number) => {
+    const context = useContext(NftContext)
+    context.setBridgeDirection(value)
+}
+
+export const useBridgeDirection = () => {
+    const context = useContext(NftContext)
+    return (context.bridgeDirection)
+}

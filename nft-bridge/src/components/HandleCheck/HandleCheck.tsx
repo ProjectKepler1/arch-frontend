@@ -14,12 +14,18 @@ const HandleCheck = (props: any) => {
     const [selected, setSelected] = useState<any>(null)
     const [selected1, setSelected1] = useState<any>(null)
     const [selected2, setSelected2] = useState<any>(null)
+    const [reset, setReset] = useState<boolean>(false)
     const [inputAddress, setInputAddress] = useState<any>(null)
     const [errorStateAddress, setErrorStateAddress] = useState<boolean | null>(null)
     const [errorStateToken, setErrorStateToken] = useState<boolean>(false)
     const [counter, setCounter] = useState<number>(1)
     const context = useContext(NftContext)
-
+    useEffect(() => {
+        setInputAddress(null)
+        setSelected(null)
+        props.returnContract(null)
+        setReset(true)
+    }, [context.bridgeDirection])
 
     const resetStatus = () => {
         setErrorStateAddress(null)
@@ -99,7 +105,7 @@ const HandleCheck = (props: any) => {
                 {
                     !props.change &&
                     <>
-                        <input className={styles.input0} placeholder={'Enter Address'} onClick={() => setShow(true)} value={selected ? selected : undefined}></input>
+                        <input className={styles.input0} placeholder={'Enter Address'} onClick={() => setShow(true)} value={selected ?? undefined}></input>
                         <ModalBridge onClose={(value: any) => handleClose(value)} show={show} title="Select Contract" id={props.id} selectedContract={selected} />
                     </>
                 }

@@ -9,12 +9,18 @@ import ConfirmationScreen from '../ConfirmationScreen/ConfirmationScreen'
 import { accountInfo } from '../../providers/WalletsProvider'
 import Approval from '../Approval/Approval'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
+import { useBridgeDirection, useSetBridgeDirection } from '../../providers/NftProvider/nft-hooks'
+import { useBridgeContract } from '../../hooks/useContract'
 const Bridge = ({ confirmation }: { confirmation: number }) => {
     const [active, setActive] = useState(0)
     const [contractAddress, setContractAddress] = useState('')
     const [tokenIds, setTokenIds] = useState([])
+    const context = useContext(NftContext)
+    const [actualisation, setActualisation] = useState(0)
+    const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void
+
     const handleClick = useMemo(function () {
-        return function (index: any) { setActive(index); }
+        return function (index: any) { setActive(index); context.setBridgeDirection(index) }
     }, [])
 
     const getInfo = useCallback((contractAddress: any, tokenId: any) => {
@@ -32,12 +38,12 @@ const Bridge = ({ confirmation }: { confirmation: number }) => {
                         <BridgeDirectionOption index={1} active={active} />
                     </div>
                 </div>
-                {confirmation === 0 && <Process bridgeDirection={active} />}
-                {confirmation === 1 && <ConfirmationScreen bridgeDirection={active} />}
+                {confirmation === 0 && <Process />}
+                {confirmation === 1 && <ConfirmationScreen />}
                 {confirmation === 2 && <Approval />}
                 {/* <ConfirmationScreen /> */}
             </div>
-            <Login />
+            <Login actualisation={forceUpdate} />
 
         </div>
     )

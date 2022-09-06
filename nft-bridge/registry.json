@@ -3,18 +3,24 @@
         "id": 1,
         "name": "Crypto Punks",
         "L1_address": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
-        "L2_address": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
+        "L2_address": ""
     },
     {
         "id": 2,
         "name": "BAYC",
         "L1_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
-        "L2_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"
+        "L2_address": ""
     },
     {
         "id": 3,
         "name": "Moonbirds",
         "L1_address": "0x23581767a106ae21c074b2276d25e5c3e136a68b",
-        "L2_address": "0x23581767a106ae21c074b2276d25e5c3e136a68b"
+        "L2_address": ""
+    },
+    {
+        "id": 4,
+        "name": "Pxls",
+        "L1_address": "",
+        "L2_address": "0x045963ea13d95f22b58a5f0662ed172278e6b420cded736f846ca9bde8ea476a"
     }
 ]

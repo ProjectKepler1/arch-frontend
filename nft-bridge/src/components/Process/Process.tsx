@@ -13,9 +13,10 @@ import { getNFTsForOwnerFilteredByCollection } from '../../nft-api/Alchemy'
 import { truncateAddress } from '../../utils'
 import Link from 'next/link'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
+import { useNFTCollectionGroupBy, useStarknetCollectionTracker, useStarknetImageForIds, useStarknetNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
 
-const Process = ({ bridgeDirection }: { bridgeDirection: number }) => {
-    const [inputState, setInputState] = useState<boolean>(false)
+const Process = () => {
+    const [inputState, setInputState] = useState<boolean | null>(null)
     const [errorState, setErrorState] = useState<boolean>(false)
     const [show, setShow] = useState<boolean>(false)
     const [contract, setContract] = useState<string | null>(null)
@@ -26,6 +27,7 @@ const Process = ({ bridgeDirection }: { bridgeDirection: number }) => {
     const starknetAddress = accountInfo.L2.account
     const metaAddress = accountInfo.L1.account
     const context = useContext(NftContext)
+    const [shownAddress, setShownAddres] = useState<string | null>(null)
     const [receivingAddress1, setReceivingAddress1] = useState<string | null>(null)
 
     // const getNFTs = useCallback(() => {
@@ -46,13 +48,24 @@ const Process = ({ bridgeDirection }: { bridgeDirection: number }) => {
         setChange1(!change1)
     }
     const handleInputState = () => {
-        if (starknetAddress.length < 3) {
+        if (context.bridgeDirection == 0 && starknetAddress.length < 3) {
+            setErrorState(true)
+        }
+        else if (context.bridgeDirection == 1 && metaAddress.length < 3) {
             setErrorState(true)
         }
         else {
-            setInputState(!inputState)
+            context.bridgeDirection == 0 ? setShownAddres(truncateAddress(starknetAddress)) : setShownAddres(truncateAddress(metaAddress))
+            setInputState(true)
         }
     }
+
+    useEffect(() => {
+        setContract(null)
+        setTokenId([])
+        setShownAddres(null)
+    }, [context.bridgeDirection])
+
     // useEffect(() => {
     //     if (registry) getNFTs()
     // }, [registry])
@@ -60,9 +73,9 @@ const Process = ({ bridgeDirection }: { bridgeDirection: number }) => {
     const saveChange = () => {
         context.setTokenIds(tokenId);
         context.setSelectedContractAddress(contract)
-        if (!receivingAddress1 && bridgeDirection == 0)
+        if (!receivingAddress1 && context.bridgeDirection == 0)
             context.setReceivingAddress(starknetAddress)
-        else if (!receivingAddress1 && bridgeDirection == 1)
+        else if (!receivingAddress1 && context.bridgeDirection == 1)
             context.setReceivingAddress(metaAddress)
         else
             context.setReceivingAddress(receivingAddress1)
@@ -75,7 +88,7 @@ const Process = ({ bridgeDirection }: { bridgeDirection: number }) => {
             <div className={styles.frame11142}>
                 <div className={styles.frame11142bis}>
                     <div className={styles.image12}>
-                        <Image src={ethLogo} style={{ position: 'relative' }} />
+                        <Image src={ethLogo} style={{ position: 'relative', width: "72px" }} />
                     </div>
                     <div className={styles.erc721}>ERC721</div>
                 </div>
@@ -106,14 +119,14 @@ const Process = ({ bridgeDirection }: { bridgeDirection: number }) => {
             </div>
             <div className={styles.line4} />
             <div className={styles.bloc3}>
-                <div className={styles.text2}>{bridgeDirection === 1 ? "Enter your Etereum Address " : "Enter your Starknet address"}</div>
-                <div className={styles.subText3}>{bridgeDirection === 1 ? "Enter the receiving Ethereum Address< " : "Enter the receiving Starknet Address<"}</div>
+                <div className={styles.text2}>{context.bridgeDirection === 1 ? "Enter your Ethereum Address " : "Enter your Starknet address"}</div>
+                <div className={styles.subText3}>{context.bridgeDirection === 1 ? "Enter the receiving Ethereum Address< " : "Enter the receiving Starknet Address<"}</div>
                 <div className={styles.subblock3}>
-                    <div className={styles.subText2}>{bridgeDirection === 1 ? "Ethereum Address" : "Starknet Address"}</div>
-                    <div className={styles.subText4} onClick={handleInputState}>{bridgeDirection === 1 ? "Use my Ethereum Address" : "Use my StarkNet Address"}</div>
+                    <div className={styles.subText2}>{context.bridgeDirection === 1 ? "Ethereum Address" : "Starknet Address"}</div>
+                    <div className={styles.subText4} onClick={handleInputState}>{context.bridgeDirection === 1 ? "Use my Ethereum Address" : "Use my StarkNet Address"}</div>
                 </div>
-                <InputError state={errorState} error={bridgeDirection === 0 ? "Please connect your Starknet wallet first" : "Please connect your Ethereum wallet first"} />
-                <ModifiedInput value={bridgeDirection === 0 ? truncateAddress(starknetAddress) : truncateAddress(metaAddress)} state={inputState} returnAddress={(value: any) => { setReceivingAddress1(value) }} bridgeDirection={bridgeDirection} />
+                <InputError state={errorState} error={context.bridgeDirection === 0 ? "Please connect your Starknet wallet first" : "Please connect your Ethereum wallet first"} />
+                <ModifiedInput state={inputState} value={inputState == true ? shownAddress : undefined} returnAddress={(value: any) => { setReceivingAddress1(value) }} />
             </div>
             <div className={styles.bottom1}>
                 {

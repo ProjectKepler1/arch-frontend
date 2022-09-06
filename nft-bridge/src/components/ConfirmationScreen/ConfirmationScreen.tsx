@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useState } from "react"
 import styles from './ConfirmationScreen.module.scss'
 import { accountInfo } from "../../providers/WalletsProvider"
 import { truncateAddress2, truncateAddress } from "../../utils"
 import copy from '../../assets/svg/vector/copy.svg'
 import Image from "next/image"
-import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds, useReceivingAddress } from "../../providers/NftProvider/nft-hooks"
+import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds, useReceivingAddress, useStarknetCollectionTracker, useStarknetImageForIds } from "../../providers/NftProvider/nft-hooks"
 import { L1BridgeContractAddress, supportedLiquidityProviders } from "../../config/envs"
 import ethLogo from "../../assets/svg/logos/eth.png"
 import Link from 'next/link'
@@ -15,12 +15,14 @@ import { useERC721Contract } from "../../contracts/ERC721"
 import { BigNumber, ethers } from "ethers"
 import { useStandardERCBridgeContract } from "../../contracts/StandardERCBridge"
 import TransactionStatus from "../TransactionStatus/TransactionStatus"
-const ConfirmationScreen = ({ bridgeDirection }: { bridgeDirection: number }) => {
+import { NftContext } from "../../providers/NftProvider/NftProvider"
+const ConfirmationScreen = () => {
     const tokenIds = useTokenIds()
     const contractAddress = useSelectedContractAddress()
+    const context = useContext(NftContext)
     const receivingAddress = useReceivingAddress()
-    const tracker = useCollectionTracker(contractAddress)
-    const sendingAddress = bridgeDirection == 0 ? accountInfo.L1.account : accountInfo.L2.account
+    const tracker = context.bridgeDirection == 0 ? useCollectionTracker(contractAddress) : useStarknetCollectionTracker(contractAddress)
+    const sendingAddress = context.bridgeDirection == 0 ? accountInfo.L1.account : accountInfo.L2.account
 
 
     const [showId, setShowId] = useState(false)
@@ -81,7 +83,6 @@ const ConfirmationScreen = ({ bridgeDirection }: { bridgeDirection: number }) =>
                 function1
             )
 
-            console.log(transactionHash)
         } catch (error) {
             console.log(error)
         }
@@ -106,18 +107,18 @@ const ConfirmationScreen = ({ bridgeDirection }: { bridgeDirection: number }) =>
                 <div className={styles.frame11144}>
                     <div className={styles.frame11141}>
                         <div className={styles.text1}>
-                            {bridgeDirection === 0 ? "Eth Address" : "Starknet Address"}
+                            {context.bridgeDirection === 0 ? "Eth Address" : "Starknet Address"}
                         </div>
                         <div className={styles.block}>
                             <div className={styles.address1}>
                                 {truncateAddress2(sendingAddress)}
                             </div>
-                            <Image src={copy} onClick={() => navigator.clipboard.writeText(accountInfo.L1.account)}></Image>
+                            <Image src={copy} onClick={() => navigator.clipboard.writeText(sendingAddress)}></Image>
                         </div>
                     </div>
                     <div className={styles.frame11141}>
                         <div className={styles.text1}>
-                            Starknet Address:
+                            {context.bridgeDirection === 0 ? "Starknet Address" : "Eth Address"}
                         </div>
                         <div className={styles.block}>
                             <div className={styles.address1}>
@@ -181,7 +182,7 @@ const ConfirmationScreen = ({ bridgeDirection }: { bridgeDirection: number }) =>
 
                                 <div className={styles.frame11146}>
                                     <div className={styles.image13}>
-                                        <img src={useImageForIds(contractAddress, id)} style={{ width: "72px" }} />
+                                        <img src={context.bridgeDirection == 0 ? useImageForIds(contractAddress, id) : useStarknetImageForIds(contractAddress, id)} style={{ width: "72px" }} />
                                     </div>
                                     <div className={styles.span}>{id}</div>
                                 </div>
@@ -192,7 +193,7 @@ const ConfirmationScreen = ({ bridgeDirection }: { bridgeDirection: number }) =>
                             return (
                                 <div className={styles.frame11146}>
                                     <div className={styles.image13}>
-                                        <img src={useImageForIds(contractAddress, id)} style={{ width: "72px" }} />
+                                        <img src={context.bridgeDirection == 0 ? useImageForIds(contractAddress, id) : useStarknetImageForIds(contractAddress, id)} style={{ width: "72px" }} />
                                     </div>
                                     <div className={styles.span}>{id}</div>
                                 </div>
@@ -212,7 +213,7 @@ const ConfirmationScreen = ({ bridgeDirection }: { bridgeDirection: number }) =>
                                 return (
                                     <div className={styles.frame11146}>
                                         <div className={styles.image13}>
-                                            <img src={useImageForIds(contractAddress, id)} style={{ width: "72px" }} />
+                                            <img src={context.bridgeDirection == 0 ? useImageForIds(contractAddress, id) : useStarknetImageForIds(contractAddress, id)} style={{ width: "72px" }} />
                                         </div>
                                         <div className={styles.span}>{id}</div>
                                     </div>
