@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import styles from "./MultiInput.module.scss"
 import fi_x from "../../assets/svg/vector/fi_x.svg"
 import Image from 'next/image'
 import check from '../../assets/svg/vector/check-svgrepo-com.svg'
-import { useIsTokenInCollection2, useNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
+import { useIsTokenInCollection2, useIsTokenInStarkCollection2, useNFTCollectionGroupBy, useStarknetNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
 import InputError from '../ErrorState/InputError'
+import { NftContext } from '../../providers/NftProvider/NftProvider'
 const MultiInput = (props: any) => {
     const [formValue, setFormValue] = useState<any>([''])
     const [error, setError] = useState<boolean | null>(null)
     const [errorState, setErrorState] = useState<any>([''])
-    const groupByCollection = useNFTCollectionGroupBy()
+    const context = useContext(NftContext)
+    const groupByCollection = context.bridgeDirection == 0 ? useNFTCollectionGroupBy() : useStarknetNFTCollectionGroupBy()
 
     const removeField = (index: number) => {
         let newFormValue = [...formValue]
@@ -25,22 +27,41 @@ const MultiInput = (props: any) => {
     }
     const checkValidToken = (index: number, e: any) => {
         const tokenId = e.target.value
-        if (!useIsTokenInCollection2(groupByCollection, tokenId, props.address)) {
-            let newFormValue = [...formValue]
-            let newErrorState = [...errorState]
-            newFormValue[index] = tokenId
-            newErrorState[index] = true
-            setFormValue(newFormValue)
-            setErrorState(newErrorState)
+        if (context.bridgeDirection == 0) {
+            if (!useIsTokenInCollection2(groupByCollection, tokenId, props.address)) {
+                let newFormValue = [...formValue]
+                let newErrorState = [...errorState]
+                newFormValue[index] = tokenId
+                newErrorState[index] = true
+                setFormValue(newFormValue)
+                setErrorState(newErrorState)
+            }
+            else {
+                let newFormValue = [...formValue]
+                let newErrorState = [...errorState]
+                newFormValue[index] = tokenId
+                newErrorState[index] = false
+                setFormValue(newFormValue)
+                setErrorState(newErrorState)
+            }
         }
         else {
-            let newFormValue = [...formValue]
-            let newErrorState = [...errorState]
-            newFormValue[index] = tokenId
-            newErrorState[index] = false
-            setFormValue(newFormValue)
-            setErrorState(newErrorState)
-
+            if (!useIsTokenInStarkCollection2(groupByCollection, tokenId, props.address)) {
+                let newFormValue = [...formValue]
+                let newErrorState = [...errorState]
+                newFormValue[index] = tokenId
+                newErrorState[index] = true
+                setFormValue(newFormValue)
+                setErrorState(newErrorState)
+            }
+            else {
+                let newFormValue = [...formValue]
+                let newErrorState = [...errorState]
+                newFormValue[index] = tokenId
+                newErrorState[index] = false
+                setFormValue(newFormValue)
+                setErrorState(newErrorState)
+            }
         }
     }
 
@@ -49,14 +70,14 @@ const MultiInput = (props: any) => {
             setError(true)
         }
         else {
-            props.onSelect(formValue)
+            props.onSelect(formValue.filter((item: string) => item !== ""))
             setError(false)
         }
     }
     return (
         <>
             {
-
+                !props.state &&
                 formValue.map((element: any, index: number) => {
                     return (
                         <div key={index}>
@@ -72,6 +93,16 @@ const MultiInput = (props: any) => {
                     )
                 })
             }
+            {
+                props.state &&
+                <div >
+                    <div style={{ display: "flex", flexDirection: "row" }}>
+                        <input className={styles.otherInput} style={{ pointerEvents: 'none' }} placeholder='Tokens IDs' />
+                    </div>
+                    <InputError state={true} error="Please choose the contract first" />
+                </div>
+
+            }
             <div style={{ display: "flex", flexDirection: "row" }}>
                 <button className={styles.subText4} onClick={addField} > Add Tokens Ids</button >
                 <button className={styles.submit} onClick={handleSubmit}>Confirm</button>
@@ -80,7 +111,7 @@ const MultiInput = (props: any) => {
                     <Image src={check}></Image>
                 }
             </div>
-            <InputError state={error} error="Please insert valid token addresses" />
+            <InputError state={error} error="Please insert valid token Ids" />
         </>
 
     )

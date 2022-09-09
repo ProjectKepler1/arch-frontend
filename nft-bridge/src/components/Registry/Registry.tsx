@@ -76,7 +76,7 @@ const Registry = (props: any) => {
                         {bridgeregistryGroupBy && Object.keys(bridgeregistryGroupBy).map((collectionAddress: string) => {
                             return (
                                 <>
-                                    <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} >
+                                    <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} key={collectionAddress}>
                                         <div className={styles.frame11139}>
                                             <div className={styles.text}>
                                                 {registry.find(r => r.L1_address === collectionAddress)?.name}
@@ -101,7 +101,7 @@ const Registry = (props: any) => {
                         {starknetBridgeregistryGroupBy && Object.keys(starknetBridgeregistryGroupBy).map((collectionAddress: string) => {
                             return (
                                 <>
-                                    <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} >
+                                    <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} key={collectionAddress}>
                                         <div className={styles.frame11139}>
                                             <div className={styles.text}>
                                                 {registry.find(r => r.L2_address === collectionAddress)?.name}

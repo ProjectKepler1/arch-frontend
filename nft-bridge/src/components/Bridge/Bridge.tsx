@@ -12,36 +12,36 @@ import { NftContext } from '../../providers/NftProvider/NftProvider'
 import { useBridgeDirection, useSetBridgeDirection } from '../../providers/NftProvider/nft-hooks'
 import { useBridgeContract } from '../../hooks/useContract'
 const Bridge = ({ confirmation }: { confirmation: number }) => {
-    const [active, setActive] = useState(0)
     const [contractAddress, setContractAddress] = useState('')
     const [tokenIds, setTokenIds] = useState([])
     const context = useContext(NftContext)
-    const [actualisation, setActualisation] = useState(0)
     const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void
-
     const handleClick = useMemo(function () {
-        return function (index: any) { setActive(index); context.setBridgeDirection(index) }
-    }, [])
+        return function (index: any) {
+            if (confirmation === 0) {
+                context.setBridgeDirection(index)
+            }
 
+        }
+    }, [])
     const getInfo = useCallback((contractAddress: any, tokenId: any) => {
         setContractAddress(contractAddress)
         setTokenIds(tokenId)
     }, [])
+
     return (
         <div className={styles.frame11143}>
             <div className={styles.frame11142}>
                 <div className={styles.bridgeDirectionEthStarknet}>
-                    <div style={{ width: "100%", height: '100%', cursor: 'pointer' }} onClick={() => handleClick(0)}>
-                        <BridgeDirectionOption index={0} active={active} />
+                    <div style={context.bridgeDirection == 1 && confirmation == 1 ? { width: "100%", height: '100%', cursor: 'not-allowed' } : { width: "100%", height: '100%', cursor: 'pointer' }} onClick={() => handleClick(0)}>
+                        <BridgeDirectionOption index={0} active={context.bridgeDirection} />
                     </div>
-                    <div style={{ width: "100%", height: '100%', cursor: 'pointer' }} onClick={() => handleClick(1)}>
-                        <BridgeDirectionOption index={1} active={active} />
+                    <div style={context.bridgeDirection == 0 && confirmation == 1 ? { width: "100%", height: '100%', cursor: 'not-allowed' } : { width: "100%", height: '100%', cursor: 'pointer' }} onClick={() => handleClick(1)}>
+                        <BridgeDirectionOption index={1} active={context.bridgeDirection} />
                     </div>
                 </div>
                 {confirmation === 0 && <Process />}
                 {confirmation === 1 && <ConfirmationScreen />}
-                {confirmation === 2 && <Approval />}
-                {/* <ConfirmationScreen /> */}
             </div>
             <Login actualisation={forceUpdate} />
 

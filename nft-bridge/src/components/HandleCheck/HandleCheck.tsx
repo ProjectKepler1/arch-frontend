@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from 'react'
-import { useisCollectioninRegistry, useNFTCollectionGroupBy, useNFTCollectionGroupByWithCont } from '../../providers/NftProvider/nft-hooks'
+import { useisCollectioninRegistry, useNFTCollectionGroupBy, useNFTCollectionGroupByWithCont, useStarknetNFTCollectionGroupByWithCont } from '../../providers/NftProvider/nft-hooks'
 import ModalBridge from '../ModalBridge/ModalBridge'
 import styles from './HandleCkech.module.scss'
 import InputError from '../ErrorState/InputError'
@@ -9,22 +9,22 @@ import { NftContext } from '../../providers/NftProvider/NftProvider'
 import question from '../../assets/svg/vector/Tool Tips .svg'
 import check from '../../assets/svg/vector/check-svgrepo-com.svg'
 import Image from 'next/image'
+import { truncateAddress, truncateAddress2 } from '../../utils'
 const HandleCheck = (props: any) => {
     const [show, setShow] = useState(false)
     const [selected, setSelected] = useState<any>(null)
-    const [selected1, setSelected1] = useState<any>(null)
+    const [selected1, setSelected1] = useState<string[] | null>(null)
     const [selected2, setSelected2] = useState<any>(null)
-    const [reset, setReset] = useState<boolean>(false)
     const [inputAddress, setInputAddress] = useState<any>(null)
     const [errorStateAddress, setErrorStateAddress] = useState<boolean | null>(null)
     const [errorStateToken, setErrorStateToken] = useState<boolean>(false)
     const [counter, setCounter] = useState<number>(1)
     const context = useContext(NftContext)
     useEffect(() => {
-        setInputAddress(null)
         setSelected(null)
+        setSelected1(null)
         props.returnContract(null)
-        setReset(true)
+        setErrorStateAddress(null)
     }, [context.bridgeDirection])
 
     const resetStatus = () => {
@@ -81,7 +81,7 @@ const HandleCheck = (props: any) => {
         }
     }
     if (context.bridgeregistry && props.id === '1') {
-        const groupByCollection = useNFTCollectionGroupByWithCont(context)
+        const groupByCollection = context.bridgeDirection == 0 ? useNFTCollectionGroupByWithCont(context) : useStarknetNFTCollectionGroupByWithCont(context)
         return (
             <>
                 {
@@ -105,7 +105,7 @@ const HandleCheck = (props: any) => {
                 {
                     !props.change &&
                     <>
-                        <input className={styles.input0} placeholder={'Enter Address'} onClick={() => setShow(true)} value={selected ?? undefined}></input>
+                        <div className={styles.modified_input} style={!selected ? { color: "#6b7082", fontSize: "14px", fontStyle: "normal", fontWeight: "normal", fontFamily: "Roboto", letterSpacing: "normal", textAlign: "left" } : { color: "#fff" }} onClick={() => setShow(true)} >{selected ? truncateAddress2(selected) : "Enter Address"}</div>
                         <ModalBridge onClose={(value: any) => handleClose(value)} show={show} title="Select Contract" id={props.id} selectedContract={selected} />
                     </>
                 }
@@ -117,14 +117,16 @@ const HandleCheck = (props: any) => {
                 {
                     props.change1 &&
                     <>
-                        <MultiInput address={props.contract} onSelect={(value: any) => handleClose1(value)} />
+
+                        {props.contract && <MultiInput address={props.contract} onSelect={(value: any) => handleClose1(value)} state={false} />}
+                        {!props.contract && <MultiInput address={props.contract} onSelect={(value: any) => handleClose1(value)} state={true} />}
                         {/* <button className={styles.subText4} onClick={handleClick}>Add Tokens Ids</button> */}
                     </>
                 }
                 {
                     !props.change1 &&
                     <>
-                        <input className={styles.input0} placeholder={'Select Tokens IDs'} onClick={handleClick} value={selected1}></input>
+                        <div className={styles.modified_input} style={!selected1 ? { color: "#6b7082", fontSize: "14px", fontStyle: "normal", fontWeight: "normal", fontFamily: "Roboto", letterSpacing: "normal", textAlign: "left" } : { color: "#fff" }} onClick={handleClick}> {selected1 ? selected1.toString() : "Select Tokens Ids"}</div>
                         <InputError state={errorStateToken} error="Please choose the contract first" />
                         <ModalBridge onClose={(value: any) => handleClose1(value)} show={show} title="Select TokenIDs to Bridge" id={props.id} selectedContract={props.contract} />
                     </>

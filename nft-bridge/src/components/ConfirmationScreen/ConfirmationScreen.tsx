@@ -4,7 +4,7 @@ import { accountInfo } from "../../providers/WalletsProvider"
 import { truncateAddress2, truncateAddress } from "../../utils"
 import copy from '../../assets/svg/vector/copy.svg'
 import Image from "next/image"
-import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds, useReceivingAddress, useStarknetCollectionTracker, useStarknetImageForIds } from "../../providers/NftProvider/nft-hooks"
+import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds, useReceivingAddress, useStarknetCollectionTracker, useStarknetImageForIds, useTokenIdsToNumber } from "../../providers/NftProvider/nft-hooks"
 import { L1BridgeContractAddress, supportedLiquidityProviders } from "../../config/envs"
 import ethLogo from "../../assets/svg/logos/eth.png"
 import Link from 'next/link'
@@ -17,14 +17,12 @@ import { useStandardERCBridgeContract } from "../../contracts/StandardERCBridge"
 import TransactionStatus from "../TransactionStatus/TransactionStatus"
 import { NftContext } from "../../providers/NftProvider/NftProvider"
 const ConfirmationScreen = () => {
-    const tokenIds = useTokenIds()
+    const tokenIds = useTokenIdsToNumber()
     const contractAddress = useSelectedContractAddress()
     const context = useContext(NftContext)
     const receivingAddress = useReceivingAddress()
     const tracker = context.bridgeDirection == 0 ? useCollectionTracker(contractAddress) : useStarknetCollectionTracker(contractAddress)
     const sendingAddress = context.bridgeDirection == 0 ? accountInfo.L1.account : accountInfo.L2.account
-
-
     const [showId, setShowId] = useState(false)
     const [showImage, setShowImage] = useState(false)
     const [fee, setFee] = useState(0)
@@ -42,7 +40,11 @@ const ConfirmationScreen = () => {
         estimateIsWithdrawable,
         estimateInitiateCancelDeposit,
         estimateCompleteCancelDeposit,
+
     } = useStandardERCBridgeContract()
+    // const {
+    //     permissionedMint,
+    // } = useL2StandardERCBridgeContract()
     const L1_CollectionAddress = useSelectedContractAddress()
     const { setApprovalForAll } = useERC721Contract(L1_CollectionAddress)
     const L1_CollectionAddress_BN = BigNumber.from(L1_CollectionAddress)
@@ -82,12 +84,29 @@ const ConfirmationScreen = () => {
                 sendingAddress,
                 function1
             )
+            // await permissionedMint(
+
+            // )
 
         } catch (error) {
             console.log(error)
         }
 
     }
+
+    const handleWithdrawal = async () => {
+        setShowApproval(true)
+        try {
+            // await initiate_withdrawal()
+            // await permissionedBurn()
+            // await isWithdrawable()
+            // await claimWithdrawal()
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
 
     useEffect(() => {
         computeFee()
@@ -111,7 +130,7 @@ const ConfirmationScreen = () => {
                         </div>
                         <div className={styles.block}>
                             <div className={styles.address1}>
-                                {truncateAddress2(sendingAddress)}
+                                {context.bridgeDirection == 0 ? truncateAddress2(sendingAddress) : truncateAddress(sendingAddress)}
                             </div>
                             <Image src={copy} onClick={() => navigator.clipboard.writeText(sendingAddress)}></Image>
                         </div>
@@ -122,7 +141,7 @@ const ConfirmationScreen = () => {
                         </div>
                         <div className={styles.block}>
                             <div className={styles.address1}>
-                                {truncateAddress(receivingAddress)}
+                                {context.bridgeDirection == 0 ? truncateAddress(receivingAddress) : truncateAddress2(receivingAddress)}
                             </div>
                             <Image src={copy} onClick={() => navigator.clipboard.writeText(receivingAddress)} />
                         </div>

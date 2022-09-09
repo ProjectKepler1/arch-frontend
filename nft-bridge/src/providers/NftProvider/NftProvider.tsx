@@ -47,7 +47,6 @@ export const NftProvider = ({ children }: { children: any }) => {
             const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
             const firstFilteredPage = await getNFTsForOwnerFilteredByCollection('0x04FD71a7c80dee02cec42cA7C6941D0940CBf55f', filteredCollection)
             setBridgeRegistry(firstFilteredPage)
-            console.log(bridgeregistry)
         }
         if (registry) {
             getCollectionNFTs(registry.map(reg => reg.L1_address !== "" ? reg.L1_address : ""), metaAddress)
