@@ -1,12 +1,11 @@
 import { ChainInfo, isRejected, TransactionStatusStep } from '@starkware-industries/commons-js-enums';
-import { getStarknet } from '@starkware-industries/commons-js-libs/get-starknet';
-import { Contract, stark, hash, number } from '@starkware-industries/commons-js-libs/starknet';
-
+import { getStarknet } from '../libs';
+import { Contract } from 'starknet';
 import { promiseHandler } from './index';
 
 
 export const createL2Contract = (address: any, ABI: any) => {
-    return new Contract(ABI, address, getStarknet().provider);
+    return new Contract(ABI, address, getStarknet().account);
 };
 
 export const callL2Contract = async (contract: any, method: any, ...args: any) => {

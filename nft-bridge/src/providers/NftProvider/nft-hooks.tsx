@@ -85,6 +85,10 @@ export const useSelectedContractAddress = () => {
     return context.selectedContractAddress
 }
 
+export const useSelectedContractAddress2 = () => {
+    const context = useContext(NftContext)
+    return context.selectedContractAddress2
+}
 export const useReceivingAddress = () => {
     const context = useContext(NftContext)
     return context.receivingAddress

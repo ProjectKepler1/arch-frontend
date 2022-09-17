@@ -5,14 +5,15 @@ import {
   CollectionResponse,
 } from "./types";
 import { axiosClient } from "./axiosCliemt"
-
+import { supportedL1ChainId } from "../../config/envs";
 // Replace with your alchemy api key
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API;
+const isMainnet: string = supportedL1ChainId == 1 ? "mainnet" : "goerli"
 
 // https://docs.alchemy.com/alchemy/enhanced-apis/nft-api/getnfts
-const getNFTsForOwnerEndpoint = `https://eth-mainnet.g.alchemy.com/${ALCHEMY_API_KEY}/v1/getNFTs/`;
+const getNFTsForOwnerEndpoint = `https://eth-${isMainnet}.g.alchemy.com/${ALCHEMY_API_KEY}/v1/getNFTs/`;
 // https://docs.alchemy.com/alchemy/enhanced-apis/nft-api/getnftmetadata
-const getNFTsForOwnerByCollectionEndpoint = `https://eth-mainnet.g.alchemy.com/${ALCHEMY_API_KEY}/v1/getNFTsByCollection/`;
+const getNFTsForOwnerByCollectionEndpoint = `https://eth-${isMainnet}.g.alchemy.com/${ALCHEMY_API_KEY}/v1/getNFTsByCollection/`;
 
 /*
  * Fetches paginated list of NFT's owned by the given address.

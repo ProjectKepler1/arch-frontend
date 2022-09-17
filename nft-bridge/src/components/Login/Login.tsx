@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { TransactionStatus } from '@starkware-industries/commons-js-enums';
 import { ActionType } from '../../enums/ActionType';
 import { ChainInfo } from '../../enums/ChainType';
@@ -29,6 +29,10 @@ import { callL2Contract } from '../../utils/starknet';
 import { parseFromUint256 } from '../../utils';
 import { useL2TokenContract } from '../../hooks/useContract';
 import Tokens from '../../config/tokens';
+import { isContext } from 'vm';
+import { NftContext } from '../../providers/NftProvider/NftProvider';
+import registry from '../../../registry.json'
+
 export const Login = (props: any) => {
     const [trackLoginScreen, trackDownloadClick, trackWalletClick, trackLoginError] =
         useLoginTracking();
@@ -42,6 +46,7 @@ export const Login = (props: any) => {
     const { walletAccount, walletError, walletStatus, connectWallet } = useLoginWallet(network);
     const getL2TokenContract = useL2TokenContract();
     const walletHandlers = useWalletHandlerProvider(network);
+    const context = useContext(NftContext)
     useEffect(() => {
         trackLoginScreen();
         if (!isChrome()) {
@@ -90,7 +95,6 @@ export const Login = (props: any) => {
 
     const EthBalance = useCallback(async () => {
         if (accountInfo.L1.account) {
-
             const [res, error] = await promiseHandler(web3.eth.getBalance(accountInfo.L1.account))
             if (error) {
                 return Promise.reject(error);
@@ -100,7 +104,6 @@ export const Login = (props: any) => {
     }, [])
 
     const L2Balance = useCallback(async () => {
-
         const account = accountInfo.L2.account
         const tokenAddress = Tokens.L2.ETH.tokenAddress[supportedL2ChainId]
         const contract = getL2TokenContract(tokenAddress);
@@ -138,7 +141,15 @@ export const Login = (props: any) => {
         }
     };
 
+    useEffect(() => {
+        if (accountInfo.L1.account !== null)
+            context.getNFTs(registry.map(reg => reg.L1_address !== "" ? reg.L1_address : ""), accountInfo.L1.account)
+    }, [accountInfo.L1.account])
 
+    useEffect(() => {
+        if (accountInfo.L2.account !== '')
+            context.getStarkNFTs(registry.map(reg => reg.L2_address), accountInfo.L2.account)
+    }, [accountInfo.L2.account])
     const handleClickEth = () => {
         if (network === NetworkType.L1) {
 

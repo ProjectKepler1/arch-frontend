@@ -22,5 +22,11 @@
         "name": "Pxls",
         "L1_address": "",
         "L2_address": "0x045963ea13d95f22b58a5f0662ed172278e6b420cded736f846ca9bde8ea476a"
+    },
+    {
+        "id": 5,
+        "name": "Skili",
+        "L1_address": "0xDf8633A10f868e94c6d9E43FE11A6138EDa3e0a0",
+        "L2_address": "0x0774a7e05fdd4d8c5fb2604009208f8daa244e34f702892c644fca0ba79324b7"
     }
 ]

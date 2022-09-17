@@ -18,15 +18,15 @@ export const NftProvider = ({ children }: { children: any }) => {
     const [tokenIds, setTokenIds] = useState<string[]>([])
     const [receivingAddress, setReceivingAddress] = useState<string>('')
     const [selectedContractAddress, setSelectedContractAddress] = useState('')
+    const [selectedContractAddress2, setSelectedContractAddress2] = useState('')
     const [bridgeDirection, setBridgeDirection] = useState<number>(0)
 
-
-    const getStarkNFTs = useCallback(() => {
-        const getStarknetNFTCollection = async (collectionAddresses: string[], owner: string) => {
+    const getStarkNFTs = useCallback((collectionAddresses: string[], owner: string) => {
+        const getStarknetNFTCollection = async () => {
             const options = { method: 'GET', headers: { Accept: 'application/json' } };
             const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
             filteredCollection.map(async (address: string) => {
-                const collection = await fetch(`https://api.aspect.co/api/v0/assets?contract_address=${address}&owner_address=0x038534bff953a3e91480f5f3126805c90002ae93c0e484ffd2c3535ab0bbcb0a`, options)
+                const collection = await fetch(`https://api.aspect.co/api/v0/assets?contract_address=${address}&owner_address=${owner}`, options)
                 const collectionObj = await collection.json()
                 let newObj = [...starknetBridgeregistry]
                 newObj[starknetBridgeregistry.length] = collectionObj
@@ -36,29 +36,28 @@ export const NftProvider = ({ children }: { children: any }) => {
             })
             // setStarknetBridgeregistry(starknetBridge)
         }
-        if (registry) {
-            getStarknetNFTCollection(registry.map(reg => reg.L2_address), starknetAddress)
-        }
+        getStarknetNFTCollection()
+        // getStarknetNFTCollection(registry.map(reg => reg.L2_address), starknetAddress)
+
     }, [registry, setStarknetBridgeregistry])
 
 
-    const getNFTs = useCallback(() => {
-        const getCollectionNFTs = async (collectionAddresses: string[], owner: string) => {
+    const getNFTs = useCallback((collectionAddresses: string[], owner: string) => {
+        const getCollectionNFTs = async () => {
             const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
-            const firstFilteredPage = await getNFTsForOwnerFilteredByCollection('0x04FD71a7c80dee02cec42cA7C6941D0940CBf55f', filteredCollection)
+            const firstFilteredPage = await getNFTsForOwnerFilteredByCollection(owner, filteredCollection)
             setBridgeRegistry(firstFilteredPage)
         }
-        if (registry) {
-            getCollectionNFTs(registry.map(reg => reg.L1_address !== "" ? reg.L1_address : ""), metaAddress)
-        }
+        // getCollectionNFTs(registry.map(reg => reg.L1_address !== "" ? reg.L1_address : ""), metaAddress)
+        getCollectionNFTs()
     }, [registry, setBridgeRegistry])
 
-    useEffect(() => {
-        if (registry) {
-            getNFTs();
-            getStarkNFTs()
-        }
-    }, [registry, setStarknetBridgeregistry])
+    // useEffect(() => {
+    //     if (registry) {
+    //         getNFTs();
+    //         getStarkNFTs()
+    //     }
+    // }, [registry, setStarknetBridgeregistry])
 
     const context = {
         bridgeregistry,
@@ -69,8 +68,13 @@ export const NftProvider = ({ children }: { children: any }) => {
         setTokenIds,
         selectedContractAddress,
         setSelectedContractAddress,
+        selectedContractAddress2,
+        setSelectedContractAddress2,
         receivingAddress,
-        setReceivingAddress
+        setReceivingAddress,
+        getStarkNFTs,
+        getNFTs,
+
     }
     return (
         <NftContext.Provider value={context}>

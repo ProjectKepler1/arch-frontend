@@ -10,7 +10,6 @@ import { accountInfo } from '../../providers/WalletsProvider'
 import Approval from '../Approval/Approval'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
 import { useBridgeDirection, useSetBridgeDirection } from '../../providers/NftProvider/nft-hooks'
-import { useBridgeContract } from '../../hooks/useContract'
 const Bridge = ({ confirmation }: { confirmation: number }) => {
     const [contractAddress, setContractAddress] = useState('')
     const [tokenIds, setTokenIds] = useState([])

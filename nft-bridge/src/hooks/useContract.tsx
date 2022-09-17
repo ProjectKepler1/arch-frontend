@@ -6,7 +6,8 @@ import { useWeb3React } from "@web3-react/core";
 import { supportedL1ChainId } from "../config/envs";
 import { ChainType } from "../enums";
 import { web3 } from "../libs";
-
+import { useStarknetReact } from '@web3-starknet-react/core'
+import { Contract, Provider } from 'starknet'
 
 
 createL2Contract
@@ -15,7 +16,6 @@ const cache: any = {};
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API;
 const ALCHEMY_API_KEY_GOERLI = process.env.NEXT_PUBLIC_ALCHEMY_API_GOERLI
 const isMainnet = supportedL1ChainId === ChainType.L1.MAIN
-
 export const useContract = (abi: any, getContractHandler: any) => {
     return useCallback(
         (address: any) => {
@@ -34,8 +34,40 @@ export const useL2TokenContract = () => {
     return useCallback((tokenAddress: any) => getContract(tokenAddress), [getContract]);
 };
 
-export const useBridgeContract = () => {
-    const getContract = useCallback(async (address: string, abi: any) => {
+// export const useBridgeContractL2 = () => {
+//     const { account } = useStarknetReact()
+//     console.log(account)
+//     const getContractL2 = useCallback(
+//         async (address: any, abi: any) => {
+//             if (account) {
+//                 return new Contract(abi, address, account)
+//             }
+
+//             const networkName = isMainnet ? 'mainnet-alpha' : 'goerli-alpha'
+//             const provider = new Provider({ network: networkName })
+
+//             return new Contract(abi, address, provider)
+//         },
+//         [account]
+//     )
+
+//     return { getContractL2 }
+
+// }
+
+export const useBridgeContractL2 = (abi: any, getContractHandler: any) => {
+    return useCallback(
+        (address: string) => {
+            if (!cache[address]) {
+                cache[address] = getContractHandler(address, abi);
+            }
+            return cache[address];
+        },
+        [abi, getContractHandler]
+    );
+};
+export const useBridgeContractL1 = () => {
+    const getContractL1 = useCallback(async (address: string, abi: any) => {
         const provider = new ethers.providers.JsonRpcProvider(
             isMainnet
                 // ? `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`
@@ -51,5 +83,5 @@ export const useBridgeContract = () => {
 
 
     }, [])
-    return { getContract }
+    return { getContractL1 }
 }

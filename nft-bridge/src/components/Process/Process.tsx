@@ -10,11 +10,10 @@ import ModalBridge from '../ModalBridge/ModalBridge'
 import HandleCheck from '../HandleCheck/HandleCheck'
 import registry from '../../../registry.json'
 import { getNFTsForOwnerFilteredByCollection } from '../../nft-api/Alchemy'
-import { truncateAddress, truncateAddress2 } from '../../utils'
+import { promiseHandler, truncateAddress, truncateAddress2 } from '../../utils'
 import Link from 'next/link'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
-import { useNFTCollectionGroupBy, useStarknetCollectionTracker, useStarknetImageForIds, useStarknetNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
-import { starknet } from '../../libs'
+
 
 const Process = () => {
     const [inputState, setInputState] = useState<boolean | null>(null)
@@ -30,16 +29,6 @@ const Process = () => {
     const context = useContext(NftContext)
     const [shownAddress, setShownAddres] = useState<string | null>(null)
     const [receivingAddress1, setReceivingAddress1] = useState<string | null>(null)
-
-    // const getNFTs = useCallback(() => {
-    //     const countNFTs = async (collectionAddresses: string[], owner: string) => {
-    //         const firstFilteredPage = await getNFTsForOwnerFilteredByCollection('0x04FD71a7c80dee02cec42cA7C6941D0940CBf55f', collectionAddresses)
-    //         setBridgeRegistry(firstFilteredPage)
-    //     }
-    //     if (registry) {
-    //         countNFTs(registry.map(reg => reg.L1_address), metaAddress)
-    //     }
-    // }, [registry, setBridgeRegistry])
 
     const handleChange = () => {
         setChange(!change)
@@ -78,6 +67,13 @@ const Process = () => {
     const saveChange = () => {
         context.setTokenIds(tokenId);
         context.setSelectedContractAddress(contract)
+        registry.map((nft: any) => {
+            console.log(nft.L1_address.toLowerCase() == contract?.toLowerCase())
+            if (context.bridgeDirection == 0 && nft.L1_address.toLowerCase() == contract?.toLowerCase())
+                context.setSelectedContractAddress2(nft.L2_address)
+            if (context.bridgeDirection == 1 && nft.L2_address.toLowerCase() == contract?.toLowerCase())
+                context.setSelectedContractAddress2(nft.L2_address)
+        })
         if (!receivingAddress1 && context.bridgeDirection == 0)
             context.setReceivingAddress(starknetAddress)
         else if (!receivingAddress1 && context.bridgeDirection == 1)

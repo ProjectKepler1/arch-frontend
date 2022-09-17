@@ -18,6 +18,7 @@ const HandleCheck = (props: any) => {
     const [inputAddress, setInputAddress] = useState<any>(null)
     const [errorStateAddress, setErrorStateAddress] = useState<boolean | null>(null)
     const [errorStateToken, setErrorStateToken] = useState<boolean>(false)
+    const [errorStateConnexion, setErrorStateConnexion] = useState<boolean>(false)
     const [counter, setCounter] = useState<number>(1)
     const context = useContext(NftContext)
     useEffect(() => {
@@ -131,6 +132,15 @@ const HandleCheck = (props: any) => {
                         <ModalBridge onClose={(value: any) => handleClose1(value)} show={show} title="Select TokenIDs to Bridge" id={props.id} selectedContract={props.contract} />
                     </>
                 }
+            </>
+        )
+    }
+    if (!context.bridgeregistry && props.id === '1') {
+        return (
+            <>
+                <div className={styles.modified_input} style={{ color: "#6b7082", fontSize: "14px", fontStyle: "normal", fontWeight: "normal", fontFamily: "Roboto", letterSpacing: "normal", textAlign: "left" }} onClick={() => setErrorStateConnexion(true)} > Enter Address</div>
+                <InputError state={errorStateConnexion} error="Please connect your Wallets first" />
+
             </>
         )
     }
