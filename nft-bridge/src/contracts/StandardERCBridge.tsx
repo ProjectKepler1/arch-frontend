@@ -7,33 +7,42 @@ import { useWeb3React } from "@web3-react/core";
 import { L1BridgeContractAddress, L2BridgeContractAddress, supportedL1ChainId } from "../config/envs";
 import { ChainType } from "../enums";
 import { STANDARD_ERC_BRIDGE_L1 } from "../abi/immutable_abi_L1";
-import { calculateGasMargin, getHigherGWEI } from "../utils";
+import { calculateGasMargin, getDate, getHigherGWEI } from "../utils";
 import { useBridgeContractL1, useBridgeContractL2 } from "../hooks/useContract";
 import { STANDARD_ERC_BRIDGE_L2 } from "../abi/immutable_abi_L2";
-import { uint256 } from "starknet";
+import { transaction, uint256 } from "starknet";
 import { Uint256 } from "starknet/dist/utils/uint256";
+import { useTransactionL1 } from "../providers/EthTransactionProvider";
 const L1BridgeAddress: string = L1BridgeContractAddress ?? ""
 const L2BridgeAddress: string = L2BridgeContractAddress ?? ''
-
+interface Receipt {
+    transactionHash: string,
+}
 export const useStandardERCBridgeContract = () => {
     const { getContractL1 } = useBridgeContractL1()
-    // const { getContractL2 } = useBridgeContractL2()
-    const [arrayDeposit, setArrayDeposit] = useState<any[]>([''])
-    const [arrayWithdraw, setArrayWithdraw] = useState<any[]>([''])
-    const [arrayIsWithdrawable, setArrayIsWithdrawable] = useState<any[]>([''])
-    const [arrayInitiateCancelDeposit, setArrayInitiateCancelDeposit] = useState<any[]>([''])
-    const [arrayCompleteCancelDeposit, setArrayCompleteCancelDeposit] = useState<any[]>([''])
+    const { addTransactionL1 } = useTransactionL1()
+    var variable: boolean = false
     const getImmutableContractL1 = async () =>
         await getContractL1(L1BridgeAddress, STANDARD_ERC_BRIDGE_L1);
-    // const getImmutableContractL2 = async () =>
-    //     await getContractL2(L2BridgeAddress, STANDARD_ERC_BRIDGE_L2)
 
-    const deposit = async (token_L1_address: string, tokenIds: BigNumber[], sender_L2_address: BigNumber, from: string, function1 = (transactionHash: string, blockNumber: any) => { }) => {
+
+    const deposit = async (token_L1_address: string, tokenIds: BigNumber[], sender_L2_address: BigNumber, from: string) => {
         const contract = await getImmutableContractL1();
 
-        return await contract.methods.deposit(token_L1_address, tokenIds, sender_L2_address).send({ from: from }, function (error: any, transactionHash: string, blockNumber: any) {
-            function1(transactionHash, blockNumber)
-        });
+        return await contract.methods.deposit(token_L1_address, tokenIds, sender_L2_address).send({ from: from })
+            .on('transactionHash', function (hash: string) {
+                const receipt: Receipt = { transactionHash: hash }
+                addTransactionL1(receipt, "DEPOSIT", getDate(), () => { }, () => { })
+
+            })
+        // .on('confirmation', function (receipt: any) {
+        //     if (variable == false) {
+        //         console.log(receipt[0])
+        //         addTransactionL1(receipt, "DEPOSIT", getDate(), () => { }, () => { })
+        //         variable = true
+        //     }
+        // })
+
     }
 
     const estimateDeposit = async (token_L1_address: string, tokenIds: BigNumber[], sender_L2_address: BigNumber, from: string): Promise<BigNumber> => {
@@ -42,12 +51,14 @@ export const useStandardERCBridgeContract = () => {
         return gasEstimate
     }
 
-    const withdraw = async (token_L1_address: string, tokenIds: BigNumber[], recipient: string, from: string, function1 = (transactionHash: string, blockNumber: any) => { }) => {
+    const withdraw = async (token_L1_address: string, tokenIds: BigNumber[], recipient: string, from: string) => {
         const contract = await getImmutableContractL1();
-        return await contract.methods.withdraw(token_L1_address, tokenIds, recipient).send({ from: from }, function (error: any, transactionHash: string, blockNumber: any) {
-            function1(transactionHash, blockNumber)
+        return await contract.methods.withdraw(token_L1_address, tokenIds, recipient).send({ from: from })
+            .on('transactionHash', function (hash: string) {
+                const receipt: Receipt = { transactionHash: hash }
+                addTransactionL1(receipt, "DEPOSIT", getDate(), () => { }, () => { })
 
-        });
+            })
     }
     const estimateWithdraw = async (token_L1_address: string, tokenIds: BigNumber[], recipient: string, from: BigNumber) => {
         const contract = await getImmutableContractL1();
@@ -93,10 +104,7 @@ export const useStandardERCBridgeContract = () => {
         return gasEstimate
     }
 
-    // const initiate_withdraw = async (token_L2_address: BigNumber, token_L2_ids_len: BigNumber, token_L2_ids: Uint256, L1_claimant: BigNumber) => {
-    //     const contract = await getImmutableContractL2()
-    //     return await contract.invoke("initiate_withdrawal", [token_L2_address, token_L2_ids_len, token_L2_ids, L1_claimant])
-    // }
+
 
     return {
         deposit,
@@ -110,4 +118,18 @@ export const useStandardERCBridgeContract = () => {
         estimateInitiateCancelDeposit,
         estimateCompleteCancelDeposit,
     }
+}
+
+export const useStandardERCBridgeL2 = () => {
+    const getImmutableContractL2 = async () =>
+        await createL2Contract(L2BridgeAddress, STANDARD_ERC_BRIDGE_L2)
+
+    const initiate_withdraw = async (l2_token_address: BigNumber, l2_token_ids_len: number, l2_token_ids: BigNumber[], l1_claimant: BigNumber) => {
+        const contract = await getImmutableContractL2()
+        return await contract.invoke("initiate_withdraw", [l2_token_address, l2_token_ids_len, l2_token_ids, l1_claimant])
+    }
+    return {
+        initiate_withdraw
+    }
+
 }

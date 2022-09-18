@@ -103,7 +103,6 @@ const TransactionProvider = ({ children }: TransactionProviderProps): JSX.Elemen
                 (tx: TransactionState, index, self) =>
                     index === self.findIndex((txTemp) => txTemp.txHash === tx.txHash)
             )
-            console.log(filteredTxs)
             const promises: Promise<TransactionState>[] = []
             filteredTxs.forEach((tx) => promises.push(checkAndUpdateTransaction(tx, blockNumber)))
             Promise.all(promises).then((newTransactions: TransactionState[]) => {

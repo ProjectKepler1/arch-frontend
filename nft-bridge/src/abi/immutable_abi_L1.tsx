@@ -394,4 +394,3 @@ export const STANDARD_ERC_BRIDGE_L1 = [
         "type": "function"
     }
 ]
-

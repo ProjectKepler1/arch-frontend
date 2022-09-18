@@ -10,7 +10,6 @@ interface TransactionProviderProps {
 }
 const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Element => {
     const { blockNumberEth } = useBlockEth()
-    console.log(blockNumberEth)
     const [transactionsL1, dispatch] = useReducer(transactionsReducer, [])
     const syncStoreTransactions = (localTransactions: TransactionState[]) => {
         dispatch({
@@ -40,7 +39,7 @@ const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Ele
 
 
     const processTransactionEnd = (tx: TransactionState) => {
-        if (tx.code === "true") {
+        if (tx.code) {
             if (tx.successCallback) tx.successCallback()
 
             return {
@@ -90,7 +89,7 @@ const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Ele
 
     useDeepCompareEffect(() => {
         const process = async () => {
-            console.log(blockNumberEth, transactionsL1)
+            console.log(transactionsL1)
             // If block hash is undefined, stop process
             if (!blockNumberEth || transactionsL1.length === 0) {
                 return
@@ -101,7 +100,6 @@ const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Ele
                 (tx: TransactionState, index, self) =>
                     index === self.findIndex((txTemp) => txTemp.txHash === tx.txHash)
             )
-            console.log(filteredTxs)
             const promises: Promise<TransactionState>[] = []
             filteredTxs.forEach((tx) => promises.push(checkAndUpdateTransaction(tx, blockNumberEth)))
             Promise.all(promises).then((newTransactions: TransactionState[]) => {

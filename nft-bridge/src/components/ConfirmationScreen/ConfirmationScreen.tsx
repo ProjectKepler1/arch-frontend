@@ -12,7 +12,7 @@ import { data } from "../../utils"
 import { promiseHandler } from "../../utils"
 import { useERC721ContractL1, useERC721ContractL2 } from "../../contracts/ERC721"
 import { BigNumber, ethers, providers } from "ethers"
-import { useStandardERCBridgeContract } from "../../contracts/StandardERCBridge"
+import { useStandardERCBridgeContract, useStandardERCBridgeL2 } from "../../contracts/StandardERCBridge"
 import { TransactionStatus } from "../TransactionStatus/TransactionStatus"
 import { NftContext } from "../../providers/NftProvider/NftProvider"
 import { useEnvs } from "../../hooks"
@@ -21,6 +21,7 @@ import { useBlock } from "../../providers/BlockProvider"
 import { useTransaction } from "../../providers/TransactionProvider"
 import { transaction } from "starknet"
 import { useTransactionL1 } from "../../providers/EthTransactionProvider"
+import circlecheck from "../../assets/svg/vector/circle-check.svg"
 
 interface TxInfo {
     status: string,
@@ -62,12 +63,16 @@ const ConfirmationScreen = () => {
 
     } = useStandardERCBridgeContract()
 
+    const {
+        initiate_withdraw
+    } = useStandardERCBridgeL2()
     const { permissionedMint,
         permissionedBurn,
         grantRoleMinter, grantRoleBurner } = useERC721ContractL2(L2_CollectionAddress)
 
     const { setApprovalForAll } = useERC721ContractL1(L1_CollectionAddress)
     const L1_CollectionAddress_BN = BigNumber.from(L1_CollectionAddress)
+
     const L2_Sender_BN = BigNumber.from(useReceivingAddress())
     const L1_Sender_BN = accountInfo.L1.account
     const [depositError, setDepositError] = useState<string>("")
@@ -79,17 +84,15 @@ const ConfirmationScreen = () => {
         setShowImage(!showImage)
     }
     const computeFee = async () => {
-        // const gas = await estimateDeposit(L1_CollectionAddress,
-        //     tokenIds,
-        //     L2_Sender_BN,
-        //     accountInfo.L1.account
-        // )
-        // setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber())
+        const gas = await estimateDeposit(L1_CollectionAddress,
+            tokenIds,
+            receivingAddress,
+            sendingAddress
+        )
+        setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber())
     }
 
-    const function1 = (transactionHash: string, blockNumber: any) => {
 
-    }
     const getReceipt = (txHash: string) => {
         setTimeout(() => {
             return (getStarknet().account.getTransactionReceipt(txHash))
@@ -110,27 +113,27 @@ const ConfirmationScreen = () => {
     const handleDeposit = async () => {
         setShowApproval(true)
         try {
-            // await new Promise(done => setTimeout(() => done(), 3000));
-            // const tx1 = await grantRoleMinter(L2BridgeContractAddress) //grant burner role
-            // await new Promise(done => setTimeout(() => done(), 3000));
-            // const date1 = getDate()
-            // const receipt1 = await getStarknet().account.getTransactionReceipt(tx1.transaction_hash)
-            // addTransaction(receipt1, "MINTER_ROLE", date1, () => { }, () => { })
-            // await new Promise(done => setTimeout(() => done(), 3000));
-            // const tx2 = await grantRoleBurner(L2BridgeContractAddress)
-            // const date2 = getDate()
-            // await new Promise(done => setTimeout(() => done(), 3000));
-            // const receipt2 = await getStarknet().account.getTransactionReceipt(tx2.transaction_hash)
-            // addTransaction(receipt2, "BURNER_ROLE", date2, () => { }, () => { })
-            const tx = await setApprovalForAll(accountInfo.L1.account)
-
-            // await deposit(
-            //     L1_CollectionAddress,
-            //     tokenIds,
-            //     receivingAddress,
-            //     sendingAddress,
-            //     function1
-            // )
+            await new Promise<void>(done => setTimeout(() => done(), 2000));
+            const tx1 = await grantRoleMinter(L2BridgeContractAddress) //grant burner role
+            await new Promise<void>(done => setTimeout(() => done(), 2000));
+            const date1 = getDate()
+            const receipt1 = await getStarknet().account.getTransactionReceipt(tx1.transaction_hash)
+            addTransaction(receipt1, "MINTER_ROLE", date1, () => { }, () => { })
+            await new Promise<void>(done => setTimeout(() => done(), 2000));
+            const tx2 = await grantRoleBurner(L2BridgeContractAddress)
+            const date2 = getDate()
+            await new Promise<void>(done => setTimeout(() => done(), 2000));
+            const receipt2 = await getStarknet().account.getTransactionReceipt(tx2.transaction_hash)
+            addTransaction(receipt2, "BURNER_ROLE", date2, () => { }, () => { })
+            await setApprovalForAll(accountInfo.L1.account)
+            await new Promise<void>(done => setTimeout(() => done(), 5000));
+            const tx = await deposit(
+                L1_CollectionAddress,
+                tokenIds,
+                receivingAddress,
+                sendingAddress,
+            )
+            console.log(tx)
             console.log("Deposited on L1")
 
         } catch (error) {
@@ -142,10 +145,23 @@ const ConfirmationScreen = () => {
     const handleWithdrawal = async () => {
         setShowApproval(true)
         try {
-            // await initiate_withdrawal()
-            // await permissionedBurn()
-            // await isWithdrawable()
-            // await claimWithdrawal()
+            await new Promise<void>(done => setTimeout(() => done(), 2000));
+            await initiate_withdraw(
+                BigNumber.from(accountInfo.L2.account),
+                tokenIds.length,
+                tokenIds,
+                L2_Sender_BN,
+
+            )
+            await new Promise<void>(done => setTimeout(() => done(), 2000));
+            await withdraw(
+                L2_CollectionAddress,
+                tokenIds,
+                accountInfo.L1.account,
+                accountInfo.L2.account
+            )
+
+
         }
         catch (error) {
             console.log(error)
@@ -162,7 +178,7 @@ const ConfirmationScreen = () => {
     //     return gasAmount
     // }
     // const gasPrice = await web3.eth.getGasPrice();
-    // getGasAmountForContractCall(accountInfo.L1.account, "0x6CbC867Ec364B990Cf5FEB8Ef5547FC1A9Fed02F", 1000, "0x6CbC867Ec364B990Cf5FEB8Ef5547FC1A9Fed02F"))
+    // getGasAmountForContractCall(accountInfo.L1.account, L1BridgeContractAddress, 1000, L1BridgeContractAddress))
 
 
     return (
@@ -325,12 +341,28 @@ const ConfirmationScreen = () => {
 
                 </div >
             }
+            {transactionsL1.length === 2 && transactionsL1[1].code &&
+                <div className={styles.confirmation}>
+                    <Image src={circlecheck} style={{ objectFit: "contain" }}></Image>
+
+                    <div className={styles.success}>
+                        Success
+                    </div>
+                    <div style={{ width: "70%" }}>
+
+                        <div className={styles.finalW}>
+                            Bridged Assets can only be used in StarkNets Ecosystem
+                        </div>
+                    </div>
+                </div>
+
+            }
             {
                 showApproval && context.bridgeDirection == 0 &&
                 <div className={styles.frame111145}>
                     <TransactionStatus title="2. Granting Minter Role " code="MINTER_ROLE" isL1={false} isStarted={transactionsL2.length != 0 && transactionsL2[0].code !== "NOT_RECEIVED"} />
                     <TransactionStatus title="Granting Burner Role" code="BURNER_ROLE" isL1={false} isStarted={transactionsL2.length >= 2 && transactionsL2[1].code !== "NOT_RECEIVED"} />
-                    <TransactionStatus title='Set Approval for All' code="SET_APPROVAL_FOR_ALL" isL1={true} isStarted={transactionsL1.length != 0 && transactionsL2[1].code === "RECEIVED"} />
+                    <TransactionStatus title='Set Approval for All' code="SET_APPROVAL_FOR_ALL" isL1={true} isStarted={(transactionsL2.length == 2) && (transactionsL2[1].code === "RECEIVED" || transactionsL2[1].code === "PENDING" || transactionsL2[1].code === "ACCEPTED_ON_L2" || transactionsL2[1].code === "ACCEPTED_ON_L1")} />
                     <TransactionStatus title="Deposit and migration to Starknet" code="DEPOSIT" isL1={true} isStarted={false} />
                 </div>
             }

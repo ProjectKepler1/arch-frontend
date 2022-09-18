@@ -10,6 +10,7 @@ import question from '../../assets/svg/vector/Tool Tips .svg'
 import check from '../../assets/svg/vector/check-svgrepo-com.svg'
 import Image from 'next/image'
 import { truncateAddress, truncateAddress2 } from '../../utils'
+import { accountInfo } from '../../providers/WalletsProvider'
 const HandleCheck = (props: any) => {
     const [show, setShow] = useState(false)
     const [selected, setSelected] = useState<any>(null)
@@ -81,7 +82,7 @@ const HandleCheck = (props: any) => {
             setErrorStateToken(true)
         }
     }
-    if (context.bridgeregistry && props.id === '1') {
+    if (context.bridgeregistry && props.id === '1' && accountInfo.L2.account !== "") {
         const groupByCollection = context.bridgeDirection == 0 ? useNFTCollectionGroupByWithCont(context) : useStarknetNFTCollectionGroupByWithCont(context)
         return (
             <>
@@ -135,7 +136,7 @@ const HandleCheck = (props: any) => {
             </>
         )
     }
-    if (!context.bridgeregistry && props.id === '1') {
+    if ((!context.bridgeregistry || accountInfo.L2.account === "") && props.id === '1') {
         return (
             <>
                 <div className={styles.modified_input} style={{ color: "#6b7082", fontSize: "14px", fontStyle: "normal", fontWeight: "normal", fontFamily: "Roboto", letterSpacing: "normal", textAlign: "left" }} onClick={() => setErrorStateConnexion(true)} > Enter Address</div>

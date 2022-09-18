@@ -18,6 +18,14 @@
     padding: 0;
 }
 
+@media (max-width: 1000px) {
+
+    .frame11143,
+    .frame11142 {
+        flex-direction: column;
+    }
+}
+
 .frame11142 {
     flex-grow: 1;
     display: flex;
