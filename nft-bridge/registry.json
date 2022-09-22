@@ -1,32 +1,14 @@
 [
     {
         "id": 1,
-        "name": "Crypto Punks",
-        "L1_address": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
-        "L2_address": ""
+        "name": "TestNFT",
+        "L1_address": "0x5E1Da9eD21CA60B675F74244F9dCF7E3e85481c3",
+        "L2_address": "0x007907877d69619f11abee5aa47b93b87f2ed6983a85fe36da208edb00dce094"
     },
     {
         "id": 2,
-        "name": "BAYC",
-        "L1_address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
-        "L2_address": ""
-    },
-    {
-        "id": 3,
-        "name": "Moonbirds",
-        "L1_address": "0x23581767a106ae21c074b2276d25e5c3e136a68b",
-        "L2_address": ""
-    },
-    {
-        "id": 4,
-        "name": "Pxls",
-        "L1_address": "",
-        "L2_address": "0x045963ea13d95f22b58a5f0662ed172278e6b420cded736f846ca9bde8ea476a"
-    },
-    {
-        "id": 5,
-        "name": "Skili",
-        "L1_address": "0xDf8633A10f868e94c6d9E43FE11A6138EDa3e0a0",
-        "L2_address": "0x0774a7e05fdd4d8c5fb2604009208f8daa244e34f702892c644fca0ba79324b7"
+        "name": "Skite",
+        "L1_address": "0x072BF10bF7a9EE10D129509bc0F84c6837f6f233",
+        "L2_address": "0x0746fa3c1aac2850c35396eb2dbb078bc966b935f207fc86c15dabea36b12777"
     }
 ]

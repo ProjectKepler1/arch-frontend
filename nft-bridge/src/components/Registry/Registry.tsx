@@ -19,7 +19,6 @@ const Registry = (props: any) => {
     const starknetBridgeregistryGroupBy = useStarknetNFTCollectionGroupBy()
     // const starknetBridgeregistry = useStarknetNFTCollectionGroupBy()
 
-
     const handleSelectAll = () => {
         setIsCheckAll(!isCheckAll);
         setIsCheck(nftsId);
@@ -27,6 +26,27 @@ const Registry = (props: any) => {
             setIsCheck([]);
         }
     };
+    const handleClosure = () => {
+        var imageIds: string[] = []
+        isCheck.map((id: string) => {
+            imageIds.push(useStarknetImageForIds(props.selectedContract, id))
+        })
+        console.log(imageIds)
+        context.setTokenImage(imageIds)
+        props.onClose(isCheck)
+    }
+
+    const useStarknetImageForIds = (contractAddress: string, tokenId: string) => {
+        const svgToDataURL = require('svg-to-dataurl')
+        let image: string = ""
+        if (starknetBridgeregistryGroupBy)
+            starknetBridgeregistryGroupBy[contractAddress].map((nft: any) => {
+                if (tokenId == nft.token_id) {
+                    image = nft.image_uri ? svgToDataURL(nft.image_uri.replace('data:image/svg+xml,', "")) : nft.image_url_copy
+                }
+            })
+        return (image)
+    }
     const handleClick = (e: any) => {
         const { id, checked } = e.target;
         setIsCheck([...isCheck, id]);
@@ -76,10 +96,10 @@ const Registry = (props: any) => {
                         {bridgeregistryGroupBy && Object.keys(bridgeregistryGroupBy).map((collectionAddress: string) => {
                             return (
                                 <>
-                                    <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} key={collectionAddress}>
+                                    <div className={styles.selector} onClick={() => { props.onClose(collectionAddress) }} key={collectionAddress}>
                                         <div className={styles.frame11139}>
                                             <div className={styles.text}>
-                                                {registry.find(r => r.L1_address === collectionAddress)?.name}
+                                                {bridgeregistryGroupBy[collectionAddress][0].contractMetadata?.name ?? registry.find(r => r.L1_address === collectionAddress)?.name}
                                             </div>
                                             <div className={styles.subText}>
                                                 {collectionAddress}
@@ -101,10 +121,10 @@ const Registry = (props: any) => {
                         {starknetBridgeregistryGroupBy && Object.keys(starknetBridgeregistryGroupBy).map((collectionAddress: string) => {
                             return (
                                 <>
-                                    <div className={styles.selector} onClick={() => props.onClose(collectionAddress)} key={collectionAddress}>
+                                    <div className={styles.selector} onClick={() => { context.setTracker(starknetBridgeregistryGroupBy[collectionAddress][0].contract.symbol); props.onClose(collectionAddress) }} key={collectionAddress}>
                                         <div className={styles.frame11139}>
                                             <div className={styles.text}>
-                                                {registry.find(r => r.L2_address === collectionAddress)?.name}
+                                                {starknetBridgeregistryGroupBy[collectionAddress][0].contract?.name ?? registry.find(r => r.L2_address === collectionAddress)?.name}
                                             </div>
                                             <div className={styles.subText}>
                                                 {truncateAddress(collectionAddress)}
@@ -201,30 +221,32 @@ const Registry = (props: any) => {
                                 </label>
                             </div>
                         </div>
-                        {
-                            props.selectedContract != null && starknetBridgeregistryGroupBy && starknetBridgeregistryGroupBy[props.selectedContract].map((nft: any) => {
+                        <div className={styles.block}>
+                            {
+                                props.selectedContract != null && starknetBridgeregistryGroupBy && starknetBridgeregistryGroupBy[props.selectedContract].map((nft: any) => {
 
-                                return (
-                                    <div className={styles.selector} >
-                                        <div className={styles.ellipse4}>
-                                            <img className={styles.ellipse4} src={svgToDataURL(nft.image_uri.replace('data:image/svg+xml,', ""))} style={{ borderRadius: '45px' }}></img >
-                                        </div>
-                                        <div className={styles.frame11139}>
-                                            <div className={styles.text3}>
-                                                {nft.token_id}
+                                    return (
+                                        <div className={styles.selector} >
+                                            <div className={styles.ellipse4}>
+                                                <img className={styles.ellipse4} src={svgToDataURL(nft.image_uri?.replace('data:image/svg+xml,', ""))} style={{ borderRadius: '45px' }}></img >
                                             </div>
-                                        </div>
-                                        <div className={styles.frame1111}>
-                                            <label className={styles.checkboxStyle}>
-                                                <input type='checkbox' className={styles.checkbox} id={nft.token_id} onChange={e => { }} onClick={handleClick} checked={isCheck.includes(nft.token_id)} ></input>
-                                                <span className={styles.checkmark}></span>
-                                            </label>
-                                        </div>
-                                    </div>)
-                            }
-                            )}
+                                            <div className={styles.frame11139}>
+                                                <div className={styles.text3}>
+                                                    {nft.token_id}
+                                                </div>
+                                            </div>
+                                            <div className={styles.frame1111}>
+                                                <label className={styles.checkboxStyle}>
+                                                    <input type='checkbox' className={styles.checkbox} id={nft.token_id} onChange={e => { }} onClick={handleClick} checked={isCheck.includes(nft.token_id)} ></input>
+                                                    <span className={styles.checkmark}></span>
+                                                </label>
+                                            </div>
+                                        </div>)
+                                }
+                                )}
+                        </div>
                         <div className={styles.bottom1}>
-                            <button className={styles.button3} onClick={() => props.onClose(isCheck)} > Add {isCheck.length} TokenIDs</button>
+                            <button className={styles.button3} onClick={handleClosure} > Add {isCheck.length} TokenIDs</button>
                         </div>
                     </>
                 }

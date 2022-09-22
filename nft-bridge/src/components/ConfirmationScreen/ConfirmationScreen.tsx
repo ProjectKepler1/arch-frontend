@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import styles from './ConfirmationScreen.module.scss'
 import { accountInfo } from "../../providers/WalletsProvider"
-import { truncateAddress2, truncateAddress } from "../../utils"
+import { truncateAddress2, truncateAddress, getDate } from "../../utils"
 import copy from '../../assets/svg/vector/copy.svg'
 import Image from "next/image"
-import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds, useReceivingAddress, useStarknetCollectionTracker, useStarknetImageForIds, useTokenIdsToNumber, useSelectedContractAddress2 } from "../../providers/NftProvider/nft-hooks"
+import { useTokenIds, useSelectedContractAddress, useCollectionTracker, useImageForIds, useReceivingAddress, useStarknetCollectionTracker, useStarknetImageForIds, useTokenIdsToNumber, useSelectedContractAddress2, useStarknetNFTCollectionGroupBy, useNFTCollectionGroupBy, useTokenIdsUint } from "../../providers/NftProvider/nft-hooks"
 import ethLogo from "../../assets/svg/logos/eth.png"
 import Link from 'next/link'
 import { getStarknet, web3 } from '../../libs';
@@ -22,34 +22,33 @@ import { useTransaction } from "../../providers/TransactionProvider"
 import { transaction } from "starknet"
 import { useTransactionL1 } from "../../providers/EthTransactionProvider"
 import circlecheck from "../../assets/svg/vector/circle-check.svg"
+import no_image_icon from "../../assets/png/icons8-no-image-96.png"
+import { ConnectionRejectedError } from "use-wallet"
+import { useBlockEth } from "../../providers/EthBlockProvider"
 
-interface TxInfo {
-    status: string,
-    txHash: string,
-    lastChecked: string,
-
-}
 const ConfirmationScreen = () => {
     const tokenIds = useTokenIdsToNumber()
+    const tokenIdsUint = useTokenIdsUint()
     const contractAddress = useSelectedContractAddress()
     const context = useContext(NftContext)
     const receivingAddress = useReceivingAddress()
-    const tracker = context.bridgeDirection == 0 ? useCollectionTracker(contractAddress) : useStarknetCollectionTracker(contractAddress)
+    const bridgeDirection = context.bridgeDirection
     const sendingAddress = context.bridgeDirection == 0 ? accountInfo.L1.account : accountInfo.L2.account
     const [showId, setShowId] = useState(false)
     const [showImage, setShowImage] = useState(false)
     const [fee, setFee] = useState(0)
     const [usdPrice, setUsdPrice] = useState<number>(0)
     const [showApproval, setShowApproval] = useState<boolean>(false)
-    const [transactionHash, setTransactionHash] = useState<string>('')
     const L1_CollectionAddress = useSelectedContractAddress()
-    const L2_CollectionAddress = useSelectedContractAddress2()
+    const otherLContractAddress = useSelectedContractAddress2()
     const { L1BridgeContractAddress, L2BridgeContractAddress } = useEnvs();
-    const { blockHash, blockNumber } = useBlock()
     const { addTransaction, transactionsL2 } = useTransaction()
     const { addTransactionL1, transactionsL1 } = useTransactionL1()
-
-
+    const tracker = context.tracker
+    const { blockNumberEth } = useBlockEth()
+    const [startChecking, setStartChecking] = useState<boolean>(false)
+    const [boolWithdrawable, setBoolWithdrawable] = useState<string>("false")
+    const [withdrawDone, setWithdrawDone] = useState<boolean>(false)
     const { deposit,
         withdraw,
         isWithdrawable,
@@ -68,14 +67,9 @@ const ConfirmationScreen = () => {
     } = useStandardERCBridgeL2()
     const { permissionedMint,
         permissionedBurn,
-        grantRoleMinter, grantRoleBurner } = useERC721ContractL2(L2_CollectionAddress)
+        grantRoleMinter, grantRoleBurner } = useERC721ContractL2(otherLContractAddress)
 
-    const { setApprovalForAll } = useERC721ContractL1(L1_CollectionAddress)
-    const L1_CollectionAddress_BN = BigNumber.from(L1_CollectionAddress)
-
-    const L2_Sender_BN = BigNumber.from(useReceivingAddress())
-    const L1_Sender_BN = accountInfo.L1.account
-    const [depositError, setDepositError] = useState<string>("")
+    const { setApprovalForAll, estimateSetApprovalForAll } = useERC721ContractL1(contractAddress)
 
     const setShowIds = () => {
         setShowId(!showId)
@@ -84,34 +78,22 @@ const ConfirmationScreen = () => {
         setShowImage(!showImage)
     }
     const computeFee = async () => {
-        const gas = await estimateDeposit(L1_CollectionAddress,
-            tokenIds,
-            receivingAddress,
-            sendingAddress
-        )
-        setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber())
+        // await setApprovalForAll(accountInfo.L1.account)
+        // const gas = await estimateDeposit(L1_CollectionAddress,
+        //     tokenIds,
+        //     receivingAddress,
+        //     sendingAddress
+        // )
+        // const gasPrice = await web3.eth.getGasPrice();
+        // setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber() * gasPrice / 1000000000000)
+        // const eth = await ethPrice('usd');
+        // setUsdPrice(parseInt(eth[0].slice(5, 13)) * fee)
     }
+    useEffect(() => {
+        computeFee()
+    }, [accountInfo.L1.account])
 
-
-    const getReceipt = (txHash: string) => {
-        setTimeout(() => {
-            return (getStarknet().account.getTransactionReceipt(txHash))
-        }, 5000)
-    }
-    const getDate = () => {
-        const c_date = new Date()
-        const date = c_date.toLocaleDateString(undefined, { // you can use undefined as first argument
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        })
-        return (date)
-    }
     const handleDeposit = async () => {
-        setShowApproval(true)
         try {
             await new Promise<void>(done => setTimeout(() => done(), 2000));
             const tx1 = await grantRoleMinter(L2BridgeContractAddress) //grant burner role
@@ -128,7 +110,7 @@ const ConfirmationScreen = () => {
             await setApprovalForAll(accountInfo.L1.account)
             await new Promise<void>(done => setTimeout(() => done(), 5000));
             const tx = await deposit(
-                L1_CollectionAddress,
+                contractAddress,
                 tokenIds,
                 receivingAddress,
                 sendingAddress,
@@ -141,37 +123,73 @@ const ConfirmationScreen = () => {
         }
 
     }
+    window.onbeforeunload = function () {
+        return "Data will be lost if you leave the page, are you sure?";
+    };
 
     const handleWithdrawal = async () => {
-        setShowApproval(true)
         try {
             await new Promise<void>(done => setTimeout(() => done(), 2000));
-            await initiate_withdraw(
-                BigNumber.from(accountInfo.L2.account),
-                tokenIds.length,
-                tokenIds,
-                L2_Sender_BN,
-
+            const tx1 = await initiate_withdraw(
+                contractAddress,
+                tokenIdsUint,
+                receivingAddress,
             )
             await new Promise<void>(done => setTimeout(() => done(), 2000));
-            await withdraw(
-                L2_CollectionAddress,
-                tokenIds,
-                accountInfo.L1.account,
-                accountInfo.L2.account
-            )
-
+            const date1 = getDate()
+            const receipt1 = await getStarknet().account.getTransactionReceipt(tx1.transaction_hash)
+            addTransaction(receipt1, "INITIATE_WITHDRAW", date1, () => { }, () => { })
 
         }
         catch (error) {
             console.log(error)
         }
     }
+    const handleClick = () => {
+        if (bridgeDirection == 0) {
+            setShowApproval(true)
+            handleDeposit()
+        }
+        else {
+            setShowApproval(true)
+            handleWithdrawal()
+        }
 
+    }
+
+
+
+    const checkWithdrawable = useCallback(() => {
+        const withdrawable = () => {
+            isWithdrawable(
+                otherLContractAddress,
+                tokenIds,
+                receivingAddress,
+                accountInfo.L1.account
+            )
+                .then((result) => { setBoolWithdrawable(result.toString()) })
+                .catch(console.log)
+
+        }
+        withdrawable()
+    }, [])
 
     useEffect(() => {
-        computeFee()
-    }, [setFee, setUsdPrice, fee])
+        if (transactionsL2.length != 0 && transactionsL2[0].code == "ACCEPTED_ON_L1")
+            checkWithdrawable()
+    }, [blockNumberEth])
+
+    useEffect(() => {
+        if (boolWithdrawable == "true" && transactionsL1.length == 0) {
+            setBoolWithdrawable("done")
+            withdraw(
+                otherLContractAddress,
+                tokenIds,
+                receivingAddress,
+                accountInfo.L1.account)
+                .then(() => console.log("Deposited on L1"))
+        }
+    }, [boolWithdrawable])
     // const getGasAmountForContractCall = async (fromAddress: any, toAddress: any, amount: any, contractAddress: any) => {
     //     const contract = new web3.eth.Contract(ABI, contractAddress);
     //     const gasAmount = await contract.methods.transfer(toAddress, Web3.utils.toWei(`${amount}`)).estimateGas({ from: fromAddress });
@@ -252,7 +270,7 @@ const ConfirmationScreen = () => {
                             Tracker:
                         </div>
                         <div className={styles.address1}>
-                            {tracker.toString()}
+                            {tracker}
                         </div>
                     </div>
                     <div className={styles.frame11145}>
@@ -262,7 +280,7 @@ const ConfirmationScreen = () => {
 
                                 <div className={styles.frame11146}>
                                     <div className={styles.image13}>
-                                        <img src={context.bridgeDirection == 0 ? useImageForIds(contractAddress, id) : useStarknetImageForIds(contractAddress, id)} style={{ width: "72px" }} />
+                                        <img src={context.imageToken} style={{ width: "72px" }} />
                                     </div>
                                     <div className={styles.span}>{id}</div>
                                 </div>
@@ -334,44 +352,61 @@ const ConfirmationScreen = () => {
                                 Back
                             </button>
                         </Link>
-                        <button className={styles.button2} onClick={handleDeposit}>
+
+                        <button className={styles.button2} onClick={handleClick}>
                             Confirm
                         </button>
                     </div>
 
                 </div >
             }
-            {transactionsL1.length === 2 && transactionsL1[1].code &&
-                <div className={styles.confirmation}>
-                    <Image src={circlecheck} style={{ objectFit: "contain" }}></Image>
-
-                    <div className={styles.success}>
-                        Success
-                    </div>
-                    <div style={{ width: "70%" }}>
-
-                        <div className={styles.finalW}>
-                            Bridged Assets can only be used in StarkNets Ecosystem
-                        </div>
-                    </div>
-                </div>
-
-            }
             {
                 showApproval && context.bridgeDirection == 0 &&
                 <div className={styles.frame111145}>
+                    {transactionsL1.length === 2 && transactionsL1[1].code &&
+                        <div className={styles.confirmation}>
+                            <Image src={circlecheck} style={{ objectFit: "contain" }}></Image>
+
+                            <div className={styles.success}>
+                                Success
+                            </div>
+                            <div style={{ width: "70%" }}>
+
+                                <div className={styles.finalW}>
+                                    Bridged Assets can only be used in StarkNets Ecosystem
+                                </div>
+                            </div>
+                        </div>
+
+                    }
                     <TransactionStatus title="2. Granting Minter Role " code="MINTER_ROLE" isL1={false} isStarted={transactionsL2.length != 0 && transactionsL2[0].code !== "NOT_RECEIVED"} />
                     <TransactionStatus title="Granting Burner Role" code="BURNER_ROLE" isL1={false} isStarted={transactionsL2.length >= 2 && transactionsL2[1].code !== "NOT_RECEIVED"} />
                     <TransactionStatus title='Set Approval for All' code="SET_APPROVAL_FOR_ALL" isL1={true} isStarted={(transactionsL2.length == 2) && (transactionsL2[1].code === "RECEIVED" || transactionsL2[1].code === "PENDING" || transactionsL2[1].code === "ACCEPTED_ON_L2" || transactionsL2[1].code === "ACCEPTED_ON_L1")} />
-                    <TransactionStatus title="Deposit and migration to Starknet" code="DEPOSIT" isL1={true} isStarted={false} />
+                    <TransactionStatus title="Deposit and migration to Starknet" code="DEPOSIT" isL1={true} isStarted={transactionsL1.length >= 1 && transactionsL1[0].code} />
                 </div>
             }
             {
                 showApproval && context.bridgeDirection == 1 &&
                 <div className={styles.frame111145}>
-                    <TransactionStatus title="Initiate withdrawal from L2" />
-                    <TransactionStatus title="Withdrawable ?" />
-                    <TransactionStatus title="Transfer to the recipient account" />
+                    {transactionsL2.length === 1 && transactionsL1.length != 0 && transactionsL1[0].code &&
+                        <div className={styles.confirmation}>
+                            <Image src={circlecheck} style={{ objectFit: "contain" }}></Image>
+
+                            <div className={styles.success}>
+                                Success
+                            </div>
+                            <div style={{ width: "70%" }}>
+
+                                <div className={styles.finalW}>
+                                    Bridged Assets can only be used in StarkNets Ecosystem
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                    <TransactionStatus title="Initiate withdrawal from L2" code="INITIATE_WITHDRAW" isL1={false} isStarted={transactionsL2.length != 0 && transactionsL2[0].code !== "NOT_RECEIVED"} />
+                    <TransactionStatus title="is Withdrawable ?" code="WITHDRAWABLE" isL1={true} isStarted={transactionsL2.length != 0 && transactionsL2[0].code === "ACCEPTED_ON_L1"} />
+                    <TransactionStatus title="Transfer to the recipient account" code="WITHDRAW" isL1={true} isStarted={boolWithdrawable == "true" || boolWithdrawable == "done" || transactionsL1.length != 0} />
                 </div>
             }
         </>

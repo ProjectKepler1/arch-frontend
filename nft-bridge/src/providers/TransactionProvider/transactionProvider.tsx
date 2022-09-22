@@ -42,7 +42,7 @@ const TransactionProvider = ({ children }: TransactionProviderProps): JSX.Elemen
 
 
     const processTransactionEnd = (tx: TransactionState) => {
-        if (tx.code === 'ACCEPTED_ON_L1' || tx.code === 'ACCEPTED_ON_L2') {
+        if ((tx.code === 'ACCEPTED_ON_L1' && tx.description === "INITIATE_WITHDRAW") || (tx.code === 'ACCEPTED_ON_L2' && (tx.description === "MINTER_ROLE" || tx.description === "BURNER_ROLE"))) {
             if (tx.successCallback) tx.successCallback()
 
             return {
@@ -64,7 +64,7 @@ const TransactionProvider = ({ children }: TransactionProviderProps): JSX.Elemen
     }
 
 
-    const checkAndUpdateTransaction = async (tx: TransactionState, newBlockNumber: number) => {
+    const checkAndUpdateTransaction = async (tx: TransactionState, newBlockNumber: number,) => {
         const txEndedResponse = processTransactionEnd(tx)
         if (txEndedResponse) return txEndedResponse
         if (tx.lastCalled === newBlockNumber && tx.code !== 'NOT_RECEIVED') {

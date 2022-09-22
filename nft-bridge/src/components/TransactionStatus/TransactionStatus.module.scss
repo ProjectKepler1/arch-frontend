@@ -101,6 +101,7 @@
 
 .address {
     align-self: stretch;
+    cursor: pointer;
     flex-grow: 1;
     font-family: Roboto;
     font-size: 14px;
@@ -110,5 +111,6 @@
     line-height: 1.57;
     letter-spacing: normal;
     text-align: right;
+    text-decoration: underline;
     color: #57c6e4;
 }

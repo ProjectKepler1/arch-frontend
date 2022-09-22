@@ -39,7 +39,7 @@ const Bridge = ({ confirmation }: { confirmation: number }) => {
                         <BridgeDirectionOption index={1} active={context.bridgeDirection} />
                     </div>
                 </div>
-                {confirmation === 0 && <Process />}
+                {(confirmation === 0) && <Process />}
                 {confirmation === 1 && <ConfirmationScreen />}
             </div>
             <Login actualisation={forceUpdate} />

@@ -5,12 +5,14 @@ import { EthTransactionContext } from "./transaction-context"
 import { transactionsReducer } from "./transaction-reducer"
 import useDeepCompareEffect from 'use-deep-compare-effect'
 import { useBlockEth } from "../EthBlockProvider";
+import { useStandardERCBridgeContract } from "../../contracts/StandardERCBridge";
 interface TransactionProviderProps {
     children: React.ReactNode
 }
 const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Element => {
     const { blockNumberEth } = useBlockEth()
     const [transactionsL1, dispatch] = useReducer(transactionsReducer, [])
+    const { isWithdrawable } = useStandardERCBridgeContract()
     const syncStoreTransactions = (localTransactions: TransactionState[]) => {
         dispatch({
             type: 'UPDATE_TRANSACTIONS',
@@ -48,15 +50,6 @@ const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Ele
                 errorCallback: undefined,
             }
         }
-        if (tx.code === 'null') {  //a changer
-            if (tx.errorCallback) tx.errorCallback()
-
-            return {
-                ...tx,
-                successCallback: undefined,
-                errorCallback: undefined,
-            }
-        }
         return undefined
     }
 
@@ -64,13 +57,13 @@ const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Ele
     const checkAndUpdateTransaction = async (tx: TransactionState, newBlockNumber: number) => {
         const txEndedResponse = processTransactionEnd(tx)
         if (txEndedResponse) return txEndedResponse
-        if (tx.lastCalled === newBlockNumber && tx.code !== 'null') {
+        if (tx.lastCalled === newBlockNumber) {
             return tx
         }
 
         try {
             // get the new status of the tx
-            const newStatus = web3.eth.getTransactionReceipt(tx.txHash)
+            const newStatus = await web3.eth.getTransactionReceipt(tx.txHash)
             // Update & return the transaction
             const newTransaction: TransactionState = {
                 ...tx,
@@ -109,7 +102,6 @@ const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Ele
         }
         process()
     }, [blockNumberEth, transactionsL1])
-
     return (
         <EthTransactionContext.Provider
             value={{ transactionsL1, addTransactionL1 }}

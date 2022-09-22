@@ -2,6 +2,7 @@ import React from 'react'
 import Title from '../components/Title/Title'
 import Header from '../layout/Header/Header'
 import Bridge from '../components/Bridge/Bridge'
+import { accountInfo } from '../providers/WalletsProvider'
 
 const confirmation = () => {
     return (
@@ -11,6 +12,7 @@ const confirmation = () => {
             <Bridge confirmation={1} />
         </div>
     )
+
 }
 
 export default confirmation

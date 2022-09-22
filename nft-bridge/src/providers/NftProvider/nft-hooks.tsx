@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import { bnToUint256 } from 'starknet/dist/utils/uint256'
 import { NftContext } from './NftProvider'
 export const useNFTCollection = () => {
     const context = useContext(NftContext)
@@ -36,29 +37,31 @@ export const useNFTCollectionGroupByWithCont = (context: any) => {
 
 export const useStarknetNFTCollectionGroupBy = () => {
     const context = useContext(NftContext)
-    const collection = context.starknetBridgeregistry;
+    const newColl: any = []
+    context.starknetBridgeregistry.forEach((element: any) => newColl.push(...element));
     let groupByCollection: Record<any, any[]> | null = null
     const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
         arr.reduce((groups, item) => {
             (groups[key(item)] ||= []).push(item);
             return groups;
         }, {} as Record<K, T[]>);
-    if (collection)
-        groupByCollection = groupBy<any, any>(collection[0].assets, ((nft: any) => nft.contract_address))
+    console.log(newColl)
+    groupByCollection = groupBy<any, any>(newColl, ((nft: any) => nft.contract_address))
     return (groupByCollection)
 
 }
 
 export const useStarknetNFTCollectionGroupByWithCont = (context: any) => {
-    const collection = context.starknetBridgeregistry
+    const newColl: any = []
+    context.starknetBridgeregistry.forEach((element: any) => newColl.push(...element));
     let groupByCollection: Record<any, any[]> | null = null
     const groupBy = <T, K extends keyof any>(arr: T[], key: (i: T) => K) =>
         arr.reduce((groups, item) => {
             (groups[key(item)] ||= []).push(item);
             return groups;
         }, {} as Record<K, T[]>);
-    if (collection)
-        groupByCollection = groupBy<any, any>(collection[0].assets, ((nft: any) => nft.contract_address))
+    groupByCollection = groupBy<any, any>(newColl, ((nft: any) => nft.contract_address))
+    console.log(groupByCollection)
     return (groupByCollection)
 }
 
@@ -68,6 +71,7 @@ export const useCollectionTracker = (collectionAddress: string) => {
 }
 
 export const useStarknetCollectionTracker = (collectionAddress: string) => {
+    const context = useContext(NftContext)
     const groupByCollection = useStarknetNFTCollectionGroupBy()
     if (groupByCollection)
         return (groupByCollection[collectionAddress][0].contract.symbol)
@@ -79,6 +83,11 @@ export const useTokenIds = () => {
 export const useTokenIdsToNumber = () => {
     const context = useContext(NftContext)
     return context.tokenIds.map((str: string) => { return Number(str) })
+
+}
+export const useTokenIdsUint = () => {
+    const context = useContext(NftContext)
+    return context.tokenIds.map((str: string) => { return bnToUint256(str) })
 }
 export const useSelectedContractAddress = () => {
     const context = useContext(NftContext)

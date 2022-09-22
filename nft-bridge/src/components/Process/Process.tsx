@@ -13,6 +13,8 @@ import { getNFTsForOwnerFilteredByCollection } from '../../nft-api/Alchemy'
 import { promiseHandler, truncateAddress, truncateAddress2 } from '../../utils'
 import Link from 'next/link'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
+import { web3 } from '../../libs'
+import { useNFTCollectionGroupBy, useStarknetNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
 
 
 const Process = () => {
@@ -29,7 +31,6 @@ const Process = () => {
     const context = useContext(NftContext)
     const [shownAddress, setShownAddres] = useState<string | null>(null)
     const [receivingAddress1, setReceivingAddress1] = useState<string | null>(null)
-
     const handleChange = () => {
         setChange(!change)
     }
@@ -68,11 +69,10 @@ const Process = () => {
         context.setTokenIds(tokenId);
         context.setSelectedContractAddress(contract)
         registry.map((nft: any) => {
-            console.log(nft.L1_address.toLowerCase() == contract?.toLowerCase())
             if (context.bridgeDirection == 0 && nft.L1_address.toLowerCase() == contract?.toLowerCase())
                 context.setSelectedContractAddress2(nft.L2_address)
             if (context.bridgeDirection == 1 && nft.L2_address.toLowerCase() == contract?.toLowerCase())
-                context.setSelectedContractAddress2(nft.L2_address)
+                context.setSelectedContractAddress2(nft.L1_address)
         })
         if (!receivingAddress1 && context.bridgeDirection == 0)
             context.setReceivingAddress(starknetAddress)

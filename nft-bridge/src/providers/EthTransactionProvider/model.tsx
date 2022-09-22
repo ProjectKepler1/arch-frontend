@@ -3,7 +3,7 @@ import { GetTransactionReceiptResponse, GetTransactionResponse, InvokeFunctionRe
 export interface TransactionState {
     txHash?: string
     lastCalled?: number
-    code?: string
+    code?: boolean
     date?: string
     successCallback?: () => void
     errorCallback?: () => void

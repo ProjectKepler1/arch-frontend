@@ -4,6 +4,8 @@ import { getNFTsForOwnerFilteredByCollection } from "../../nft-api/Alchemy"
 import registry from '../../../registry.json'
 import { accountInfo } from "../WalletsProvider"
 import { Console } from "console"
+import { ConnectionRejectedError } from "use-wallet"
+import { supportedL1ChainId } from "../../config/envs"
 
 
 
@@ -20,28 +22,8 @@ export const NftProvider = ({ children }: { children: any }) => {
     const [selectedContractAddress, setSelectedContractAddress] = useState('')
     const [selectedContractAddress2, setSelectedContractAddress2] = useState('')
     const [bridgeDirection, setBridgeDirection] = useState<number>(0)
-
-    const getStarkNFTs = useCallback((collectionAddresses: string[], owner: string) => {
-        const getStarknetNFTCollection = async () => {
-            const options = { method: 'GET', headers: { Accept: 'application/json' } };
-            const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
-            filteredCollection.map(async (address: string) => {
-                const collection = await fetch(`https://api.aspect.co/api/v0/assets?contract_address=${address}&owner_address=${owner}`, options)
-                const collectionObj = await collection.json()
-                let newObj = [...starknetBridgeregistry]
-                newObj[starknetBridgeregistry.length] = collectionObj
-                // console.log(newObj)
-                setStarknetBridgeregistry(newObj)
-                // console.log(starknetBridgeregistry)
-            })
-            // setStarknetBridgeregistry(starknetBridge)
-        }
-        getStarknetNFTCollection()
-        // getStarknetNFTCollection(registry.map(reg => reg.L2_address), starknetAddress)
-
-    }, [registry, setStarknetBridgeregistry])
-
-
+    const [tracker, setTracker] = useState<string>()
+    const [tokenImage, setTokenImage] = useState<string[]>()
     const getNFTs = useCallback((collectionAddresses: string[], owner: string) => {
         const getCollectionNFTs = async () => {
             const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
@@ -64,15 +46,19 @@ export const NftProvider = ({ children }: { children: any }) => {
         bridgeDirection,
         setBridgeDirection,
         starknetBridgeregistry,
+        setStarknetBridgeregistry,
         tokenIds,
+        tracker,
+        setTracker,
         setTokenIds,
+        tokenImage,
+        setTokenImage,
         selectedContractAddress,
         setSelectedContractAddress,
         selectedContractAddress2,
         setSelectedContractAddress2,
         receivingAddress,
         setReceivingAddress,
-        getStarkNFTs,
         getNFTs,
 
     }

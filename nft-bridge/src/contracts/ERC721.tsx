@@ -29,9 +29,14 @@ export const useERC721ContractL1 = (L1_CollectionAddress: string) => {
 
     }
 
+    const estimateSetApprovalForAll = async (from: string) => {
+        const contract = await getERC721Contract()
+        return await contract.methods.setApprovalForAll(L1BridgeContractAddress, true).estimateGas({ from: from })
+    }
+
 
     return {
-        setApprovalForAll
+        setApprovalForAll, estimateSetApprovalForAll
     }
 }
 

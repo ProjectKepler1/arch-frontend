@@ -24,7 +24,7 @@ export const transactionsReducer = (
         case 'ADD_TRANSACTION': {
             const storedTx = {
                 txHash: action.payload.transactionHash,
-                code: action.payload.status ?? "false",
+                code: action.payload.status ?? false,
                 description: action.description,
                 date: action.date,
                 lastChecked: '',

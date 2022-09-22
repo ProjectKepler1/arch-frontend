@@ -56,7 +56,7 @@ export const useStandardERCBridgeContract = () => {
         return await contract.methods.withdraw(token_L1_address, tokenIds, recipient).send({ from: from })
             .on('transactionHash', function (hash: string) {
                 const receipt: Receipt = { transactionHash: hash }
-                addTransactionL1(receipt, "DEPOSIT", getDate(), () => { }, () => { })
+                addTransactionL1(receipt, "WITHDRAW", getDate(), () => { }, () => { })
 
             })
     }
@@ -65,12 +65,12 @@ export const useStandardERCBridgeContract = () => {
         const gasEstimate = await contract.methods.withdraw(token_L1_address, tokenIds, recipient).estimateGas({ from: from })
         return gasEstimate
     }
-    const isWithdrawable = async (token_L1_address: string, tokenIds: BigNumber[], withdrawer: string, from: string, function1 = (transactionHash: string, blockNumber: any) => { }) => {
+    const isWithdrawable = async (token_L1_address: string, tokenIds: BigNumber[], withdrawer: string, from: string) => {
         const contract = await getImmutableContractL1();
-        return await contract.methods.isWithdrawable(token_L1_address, tokenIds, withdrawer).send({ from: from }, function (error: any, transactionHash: string, blockNumber: any) {
-            function1(transactionHash, blockNumber)
-
-        });
+        return await contract.methods.isWithdrawable(token_L1_address, tokenIds, withdrawer).call({ from: from })
+            .then(function (result: any) {
+                return result
+            });
     }
     const estimateIsWithdrawable = async (token_L1_address: string, tokenIds: BigNumber[], withdrawer: string, from: string) => {
         const contract = await getImmutableContractL1();
@@ -124,9 +124,9 @@ export const useStandardERCBridgeL2 = () => {
     const getImmutableContractL2 = async () =>
         await createL2Contract(L2BridgeAddress, STANDARD_ERC_BRIDGE_L2)
 
-    const initiate_withdraw = async (l2_token_address: BigNumber, l2_token_ids_len: number, l2_token_ids: BigNumber[], l1_claimant: BigNumber) => {
+    const initiate_withdraw = async (l2_token_address: BigNumber, l2_token_ids: BigNumber[], l1_claimant: BigNumber) => {
         const contract = await getImmutableContractL2()
-        return await contract.invoke("initiate_withdraw", [l2_token_address, l2_token_ids_len, l2_token_ids, l1_claimant])
+        return await contract.invoke("initiate_withdraw", [l2_token_address, l2_token_ids, l1_claimant])
     }
     return {
         initiate_withdraw

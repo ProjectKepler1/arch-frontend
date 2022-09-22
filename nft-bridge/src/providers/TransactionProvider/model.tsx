@@ -5,6 +5,7 @@ export interface TransactionState {
     lastCalled?: number
     code?: string
     date?: string
+    description?: string
     successCallback?: () => void
     errorCallback?: () => void
 }

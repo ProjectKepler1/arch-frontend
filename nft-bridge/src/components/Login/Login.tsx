@@ -141,6 +141,24 @@ export const Login = (props: any) => {
         }
     };
 
+    const getStarkNFTs = useCallback((collectionAddresses: string[], owner: string) => {
+        const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
+        const promises: any = []
+        filteredCollection.forEach(async (address) => promises.push(await getSingleStarkNFT(address, owner)))
+        // context.setStarknetBridgeregistry(promises)
+        console.log(promises)
+        context.setStarknetBridgeregistry(promises)
+
+    }, [registry])
+
+    const getSingleStarkNFT = async (collectionAddress: string, owner: string) => {
+        const options = { method: 'GET', headers: { Accept: 'application/json' } };
+        const collection = await fetch(`https://api-testnet.aspect.co/api/v0/assets?contract_address=${collectionAddress}&owner_address=${owner}`, options)
+        const collectionObj = await collection.json()
+        return collectionObj.assets
+    }
+
+
     useEffect(() => {
         if (accountInfo.L1.account !== null)
             context.getNFTs(registry.map(reg => reg.L1_address !== "" ? reg.L1_address : ""), accountInfo.L1.account)
@@ -148,7 +166,7 @@ export const Login = (props: any) => {
 
     useEffect(() => {
         if (accountInfo.L2.account !== '')
-            context.getStarkNFTs(registry.map(reg => reg.L2_address), accountInfo.L2.account)
+            getStarkNFTs(registry.map(reg => reg.L2_address), accountInfo.L2.account)
     }, [accountInfo.L2.account])
     const handleClickEth = () => {
         if (network === NetworkType.L1) {
