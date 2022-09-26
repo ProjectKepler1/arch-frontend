@@ -33,6 +33,12 @@ const Registry = (props: any) => {
         })
         console.log(imageIds)
         context.setTokenImage(imageIds)
+        localStorage.setItem('imageIds',
+            JSON.stringify(
+                imageIds.map((id: string) => {
+                    // Remove successCallback & errorCallback before stringify
+                    return id
+                })))
         props.onClose(isCheck)
     }
 
@@ -121,7 +127,7 @@ const Registry = (props: any) => {
                         {starknetBridgeregistryGroupBy && Object.keys(starknetBridgeregistryGroupBy).map((collectionAddress: string) => {
                             return (
                                 <>
-                                    <div className={styles.selector} onClick={() => { context.setTracker(starknetBridgeregistryGroupBy[collectionAddress][0].contract.symbol); props.onClose(collectionAddress) }} key={collectionAddress}>
+                                    <div className={styles.selector} onClick={() => { context.setTracker(starknetBridgeregistryGroupBy[collectionAddress][0].contract.symbol); localStorage.setItem('Tracker', starknetBridgeregistryGroupBy[collectionAddress][0].contract.symbol); props.onClose(collectionAddress) }} key={collectionAddress}>
                                         <div className={styles.frame11139}>
                                             <div className={styles.text}>
                                                 {starknetBridgeregistryGroupBy[collectionAddress][0].contract?.name ?? registry.find(r => r.L2_address === collectionAddress)?.name}

@@ -66,20 +66,57 @@ const Process = () => {
     // }, [registry])
 
     const saveChange = () => {
+        localStorage.setItem("Sending_Address", context.sendingAddress)
         context.setTokenIds(tokenId);
         context.setSelectedContractAddress(contract)
         registry.map((nft: any) => {
-            if (context.bridgeDirection == 0 && nft.L1_address.toLowerCase() == contract?.toLowerCase())
+            if (context.bridgeDirection == 0 && nft.L1_address.toLowerCase() == contract?.toLowerCase()) {
+
                 context.setSelectedContractAddress2(nft.L2_address)
-            if (context.bridgeDirection == 1 && nft.L2_address.toLowerCase() == contract?.toLowerCase())
+                localStorage.setItem("Arrival_contract_token", nft.L2_address)
+            }
+            if (context.bridgeDirection == 1 && nft.L2_address.toLowerCase() == contract?.toLowerCase()) {
+
                 context.setSelectedContractAddress2(nft.L1_address)
+                localStorage.setItem("Arrival_contract_token", nft.L1_address)
+            }
         })
-        if (!receivingAddress1 && context.bridgeDirection == 0)
+        if (!receivingAddress1 && context.bridgeDirection == 0) {
             context.setReceivingAddress(starknetAddress)
-        else if (!receivingAddress1 && context.bridgeDirection == 1)
+            localStorage.setItem("Receiving_Address", starknetAddress)
+        }
+        else if (!receivingAddress1 && context.bridgeDirection == 1) {
             context.setReceivingAddress(metaAddress)
-        else
+            localStorage.setItem("Receiving_Address", metaAddress)
+        }
+        else {
+
             context.setReceivingAddress(receivingAddress1)
+            if (receivingAddress1)
+                localStorage.setItem('Receiving_Address', receivingAddress1)
+        }
+
+
+        if (context.bridgeDirection == 0) {
+            context.setSendingAddress(metaAddress)
+            localStorage.setItem("Sending_Address", metaAddress)
+        }
+        else if (context.bridgeDirection == 1) {
+            context.setSendingAddress(starknetAddress)
+            localStorage.setItem("Receiving_Address", starknetAddress)
+        }
+
+        localStorage.setItem("tokenIds",
+            JSON.stringify(
+                tokenId.map((id: string) => {
+                    // Remove successCallback & errorCallback before stringify
+                    return id
+                })))
+        if (contract)
+            localStorage.setItem("Initial_contract_token", contract)
+
+
+        localStorage.setItem('Bridge_Direction', context.bridgeDirection)
 
     }
 

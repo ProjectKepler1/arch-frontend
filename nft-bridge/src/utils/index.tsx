@@ -33,8 +33,8 @@ export const truncateAddress = (fullAddress: string) => {
     return `${hex}...${end}`
 }
 export const truncateAddress2 = (fullAddress?: string) => {
-    const hex = fullAddress?.slice(0, 10)
-    const end = fullAddress?.slice(-4)
+    const hex = fullAddress?.slice(0, 7)
+    const end = fullAddress?.slice(-15)
     return `${hex}...${end}`
 }
 

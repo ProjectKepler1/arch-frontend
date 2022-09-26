@@ -82,6 +82,7 @@ export const useTokenIds = () => {
 }
 export const useTokenIdsToNumber = () => {
     const context = useContext(NftContext)
+    console.log(context.tokenIds)
     return context.tokenIds.map((str: string) => { return Number(str) })
 
 }

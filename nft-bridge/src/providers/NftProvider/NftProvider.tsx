@@ -19,6 +19,7 @@ export const NftProvider = ({ children }: { children: any }) => {
     const starknetAddress = accountInfo.L2.account
     const [tokenIds, setTokenIds] = useState<string[]>([])
     const [receivingAddress, setReceivingAddress] = useState<string>('')
+    const [sendingAddress, setSendingAddress] = useState<string>('')
     const [selectedContractAddress, setSelectedContractAddress] = useState('')
     const [selectedContractAddress2, setSelectedContractAddress2] = useState('')
     const [bridgeDirection, setBridgeDirection] = useState<number>(0)
@@ -52,6 +53,8 @@ export const NftProvider = ({ children }: { children: any }) => {
         setTracker,
         setTokenIds,
         tokenImage,
+        sendingAddress,
+        setSendingAddress,
         setTokenImage,
         selectedContractAddress,
         setSelectedContractAddress,

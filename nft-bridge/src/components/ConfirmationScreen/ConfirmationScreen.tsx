@@ -19,12 +19,13 @@ import { useEnvs } from "../../hooks"
 import { stringify } from "querystring"
 import { useBlock } from "../../providers/BlockProvider"
 import { useTransaction } from "../../providers/TransactionProvider"
-import { transaction } from "starknet"
+import { stark, transaction } from "starknet"
 import { useTransactionL1 } from "../../providers/EthTransactionProvider"
 import circlecheck from "../../assets/svg/vector/circle-check.svg"
 import no_image_icon from "../../assets/png/icons8-no-image-96.png"
 import { ConnectionRejectedError } from "use-wallet"
 import { useBlockEth } from "../../providers/EthBlockProvider"
+import { toFelt } from "starknet/dist/utils/number"
 
 const ConfirmationScreen = () => {
     const tokenIds = useTokenIdsToNumber()
@@ -32,8 +33,8 @@ const ConfirmationScreen = () => {
     const contractAddress = useSelectedContractAddress()
     const context = useContext(NftContext)
     const receivingAddress = useReceivingAddress()
+    const sendingAddress = context.sendingAddress
     const bridgeDirection = context.bridgeDirection
-    const sendingAddress = context.bridgeDirection == 0 ? accountInfo.L1.account : accountInfo.L2.account
     const [showId, setShowId] = useState(false)
     const [showImage, setShowImage] = useState(false)
     const [fee, setFee] = useState(0)
@@ -49,6 +50,7 @@ const ConfirmationScreen = () => {
     const [startChecking, setStartChecking] = useState<boolean>(false)
     const [boolWithdrawable, setBoolWithdrawable] = useState<string>("false")
     const [withdrawDone, setWithdrawDone] = useState<boolean>(false)
+    const ethPrice = require('eth-price');
     const { deposit,
         withdraw,
         isWithdrawable,
@@ -79,18 +81,36 @@ const ConfirmationScreen = () => {
     }
     const computeFee = async () => {
         // await setApprovalForAll(accountInfo.L1.account)
-        // const gas = await estimateDeposit(L1_CollectionAddress,
-        //     tokenIds,
-        //     receivingAddress,
-        //     sendingAddress
-        // )
-        // const gasPrice = await web3.eth.getGasPrice();
-        // setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber() * gasPrice / 1000000000000)
-        // const eth = await ethPrice('usd');
-        // setUsdPrice(parseInt(eth[0].slice(5, 13)) * fee)
+        const gas = await estimateDeposit(L1_CollectionAddress,
+            tokenIds,
+            receivingAddress,
+            sendingAddress
+        )
+        const gasPrice = await web3.eth.getGasPrice();
+        const eth = await ethPrice('usd');
+        setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber() * gasPrice / 1000000000000)
+        setUsdPrice(parseInt(eth[0].slice(5, 13)) * fee)
     }
+    const computeStarkFee = async () => {
+        try {
+            console.log(accountInfo.L1.account)
+            const calldata = stark.compileCalldata({
+                l2_token_address: contractAddress,
+                l2_token_ids: tokenIds,
+                l1_claimant: accountInfo.L1.account,
+            })
+            getStarknet().account.estimateFee({ contractAddress: L2BridgeContractAddress, entrypoint: "initiate_withdraw", calldata })
+                .then((res: any) => console.log(res))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    computeStarkFee()
     useEffect(() => {
-        computeFee()
+        if (context.bridgeDirection == 0)
+            computeFee()
+        // else
+        // computeStarkFee()
     }, [accountInfo.L1.account])
 
     const handleDeposit = async () => {
@@ -115,18 +135,28 @@ const ConfirmationScreen = () => {
                 receivingAddress,
                 sendingAddress,
             )
-            console.log(tx)
-            console.log("Deposited on L1")
 
         } catch (error) {
             console.log(error)
         }
 
     }
-    window.onbeforeunload = function () {
-        return "Data will be lost if you leave the page, are you sure?";
-    };
 
+    useEffect(() => {
+        checkStorage()
+    }, [])
+    const checkStorage = () => {
+        if (localStorage.getItem('Initial_contract_token')) {
+            context.setTokenIds(JSON.parse(localStorage.getItem("tokenIds")))
+            context.setSendingAddress(localStorage.getItem("Sending_Address"))
+            context.setSelectedContractAddress(localStorage.getItem('Initial_contract_token'))
+            context.setReceivingAddress(localStorage.getItem('Receiving_Address'))
+            context.setSelectedContractAddress2(localStorage.getItem("Arrival_contract_token"))
+            context.setTokenImage(JSON.parse(localStorage.getItem("imageIds")))
+            context.setTracker(localStorage.getItem('Tracker'))
+            context.setBridgeDirection(localStorage.getItem('Bridge_Direction'))
+        }
+    }
     const handleWithdrawal = async () => {
         try {
             await new Promise<void>(done => setTimeout(() => done(), 2000));
@@ -209,9 +239,9 @@ const ConfirmationScreen = () => {
                         </div>
                         <div className={styles.block}>
                             <div className={styles.address1}>
-                                {context.bridgeDirection == 0 ? truncateAddress2(sendingAddress) : truncateAddress(sendingAddress)}
+                                {truncateAddress(context.sendingAddress)}
                             </div>
-                            <Image src={copy} onClick={() => navigator.clipboard.writeText(sendingAddress)}></Image>
+                            <Image src={copy} onClick={() => navigator.clipboard.writeText(context.sendingAddress)}></Image>
                         </div>
                     </div>
                     <div className={styles.frame11141}>

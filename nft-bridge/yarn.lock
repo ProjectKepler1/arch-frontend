@@ -11049,10 +11049,10 @@ starknet@^3.15.0, starknet@^3.19.0:
     ts-custom-error "^3.2.0"
     url-join "^4.0.1"
 
-starknet@^4.4.2:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-4.4.2.tgz#3da5df044c4aa2607b8f282dd34ad1e167ae3a5e"
-  integrity sha512-tSQNwsx0+27pf2oi1fc1bgGDQO7cHFTWBIm+HLT6yAGs53Y/YRrc6jaxbcEl/826gv36ck53pqmF+85t1ILNMg==
+starknet@^4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-4.7.0.tgz#6a9683acb87550fd1d4d34f6417e97234bda3c49"
+  integrity sha512-XGT9DVifZd65Tem7m0hCjOZLgE0pE8rV/YlhJtxif2vUoTuHngmT4RhXh6S7LnzIcYvTCVnyF6PXPx1hdKIdvA==
   dependencies:
     "@ethersproject/bytes" "^5.6.1"
     bn.js "^5.2.1"
