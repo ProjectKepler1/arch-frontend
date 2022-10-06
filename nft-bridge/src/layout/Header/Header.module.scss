@@ -16,6 +16,23 @@
     flex-grow: 0;
 }
 
+.button3 {
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    font-family: Rajdhani;
+    font-size: 18px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    color: #fff;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: #111217;
+}
+
 .frame1 {
     flex-grow: 1;
     padding-bottom: 50px;

@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { UseWalletProvider as UseWalletProviderWrapper } from 'use-wallet';
 
 import { useEnvs } from '../hooks/useEnvs';
+import { NftContext } from './NftProvider/NftProvider';
 
 export const WalletProvider = ({ children }: { children: any }) => {
     const { pollBlockNumberInterval, supportedL1ChainId } = useEnvs();

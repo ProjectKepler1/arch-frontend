@@ -82,7 +82,6 @@ const EthTransactionProvider = ({ children }: TransactionProviderProps): JSX.Ele
 
     useDeepCompareEffect(() => {
         const process = async () => {
-            console.log(transactionsL1)
             // If block hash is undefined, stop process
             if (!blockNumberEth || transactionsL1.length === 0) {
                 return

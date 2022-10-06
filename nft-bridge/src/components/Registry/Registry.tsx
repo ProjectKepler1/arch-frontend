@@ -8,6 +8,7 @@ import registry from '../../../registry.json'
 import Image from 'next/image'
 import { useNFTCollection, useNFTCollectionGroupBy, useStarknetNFTCollection, useStarknetNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
+import no_image from "../../assets/svg/vector/no-image-6663.svg"
 const Registry = (props: any) => {
     const [isCheckAll, setIsCheckAll] = useState(false);
     const [isCheck, setIsCheck] = useState<any>([]);
@@ -31,7 +32,6 @@ const Registry = (props: any) => {
         isCheck.map((id: string) => {
             imageIds.push(useStarknetImageForIds(props.selectedContract, id))
         })
-        console.log(imageIds)
         context.setTokenImage(imageIds)
         localStorage.setItem('imageIds',
             JSON.stringify(
@@ -171,7 +171,7 @@ const Registry = (props: any) => {
                                 return (
                                     <div className={styles.selector} >
                                         <div className={styles.ellipse4}>
-                                            <img className={styles.ellipse4} src={nft.media[0].thumbnail ? nft.media[0].thumbnail : nft.media[0].gateway ? nft.media[0].gateway : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }} ></img>
+                                            <img className={styles.ellipse4} src={nft.media[0].thumbnail ? nft.media[0].thumbnail : nft.media[0].gateway ? nft.media[0].gateway : nft.media[0].raw ? svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', "")) : no_image.src} style={{ borderRadius: '45px' }} ></img>
                                         </div>
                                         <div className={styles.frame11139}>
                                             <div className={styles.text3}>
@@ -192,7 +192,7 @@ const Registry = (props: any) => {
                                     return (
                                         <div className={styles.selector} >
                                             <div className={styles.ellipse4}>
-                                                <img className={styles.ellipse4} src={nft.media[0].thumbnail ? nft.media[0].thumbnail : nft.media[0].gateway ? nft.media[0].gateway : svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', ""))} style={{ borderRadius: '45px' }}></img >
+                                                <img className={styles.ellipse4} src={nft.media[0].thumbnail ? nft.media[0].thumbnail : nft.media[0].gateway ? nft.media[0].gateway : nft.media[0].raw ? svgToDataURL(nft.media[0].raw.replace('data:image/svg+xml;utf8,', "")) : no_image.src} style={{ borderRadius: '45px' }}></img >
                                             </div>
                                             <div className={styles.frame11139}>
                                                 <div className={styles.text3}>
@@ -234,7 +234,7 @@ const Registry = (props: any) => {
                                     return (
                                         <div className={styles.selector} >
                                             <div className={styles.ellipse4}>
-                                                <img className={styles.ellipse4} src={svgToDataURL(nft.image_uri?.replace('data:image/svg+xml,', ""))} style={{ borderRadius: '45px' }}></img >
+                                                <img className={styles.ellipse4} src={nft.image_uri ? svgToDataURL(nft.image_uri?.replace('data:image/svg+xml,', "")) : no_image.src} style={{ borderRadius: '45px' }}></img >
                                             </div>
                                             <div className={styles.frame11139}>
                                                 <div className={styles.text3}>

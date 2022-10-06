@@ -1,4 +1,4 @@
-import { useStarknetReact } from '@web3-starknet-react/core'
+
 import { getStarknet } from 'get-starknet'
 import React from 'react'
 import { GetBlockResponse, Provider } from 'starknet'

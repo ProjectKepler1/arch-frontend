@@ -25,6 +25,7 @@ export const NftProvider = ({ children }: { children: any }) => {
     const [bridgeDirection, setBridgeDirection] = useState<number>(0)
     const [tracker, setTracker] = useState<string>()
     const [tokenImage, setTokenImage] = useState<string[]>()
+    const [network, setNetwork] = useState<number>(5)
     const getNFTs = useCallback((collectionAddresses: string[], owner: string) => {
         const getCollectionNFTs = async () => {
             const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
@@ -45,6 +46,7 @@ export const NftProvider = ({ children }: { children: any }) => {
     const context = {
         bridgeregistry,
         bridgeDirection,
+        network, setNetwork,
         setBridgeDirection,
         starknetBridgeregistry,
         setStarknetBridgeregistry,

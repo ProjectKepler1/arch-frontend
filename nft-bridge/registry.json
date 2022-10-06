@@ -1,13 +1,7 @@
 [
     {
         "id": 1,
-        "name": "TestNFT",
-        "L1_address": "0x5E1Da9eD21CA60B675F74244F9dCF7E3e85481c3",
-        "L2_address": "0x007907877d69619f11abee5aa47b93b87f2ed6983a85fe36da208edb00dce094"
-    },
-    {
-        "id": 2,
-        "name": "Skite",
+        "name": " TestNFT",
         "L1_address": "0x072BF10bF7a9EE10D129509bc0F84c6837f6f233",
         "L2_address": "0x0746fa3c1aac2850c35396eb2dbb078bc966b935f207fc86c15dabea36b12777"
     }

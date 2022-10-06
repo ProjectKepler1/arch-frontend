@@ -26,6 +26,7 @@ import no_image_icon from "../../assets/png/icons8-no-image-96.png"
 import { ConnectionRejectedError } from "use-wallet"
 import { useBlockEth } from "../../providers/EthBlockProvider"
 import { toFelt } from "starknet/dist/utils/number"
+import no_image from "../../assets/svg/vector/no-image-6663.svg"
 
 const ConfirmationScreen = () => {
     const tokenIds = useTokenIdsToNumber()
@@ -88,48 +89,46 @@ const ConfirmationScreen = () => {
         )
         const gasPrice = await web3.eth.getGasPrice();
         const eth = await ethPrice('usd');
-        setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber() * gasPrice / 1000000000000)
+        setFee(ethers.utils.parseUnits(gas.toString(), 'wei').toNumber() * gasPrice / 1000000000000000)
         setUsdPrice(parseInt(eth[0].slice(5, 13)) * fee)
     }
-    const computeStarkFee = async () => {
-        try {
-            console.log(accountInfo.L1.account)
-            const calldata = stark.compileCalldata({
-                l2_token_address: contractAddress,
-                l2_token_ids: tokenIds,
-                l1_claimant: accountInfo.L1.account,
-            })
-            getStarknet().account.estimateFee({ contractAddress: L2BridgeContractAddress, entrypoint: "initiate_withdraw", calldata })
-                .then((res: any) => console.log(res))
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    computeStarkFee()
+    // const computeStarkFee = async () => {
+    //     try {
+    //         const calldata = stark.compileCalldata({
+    //             l2_token_address: contractAddress,
+    //             l2_token_ids: tokenIds,
+    //             l1_claimant: accountInfo.L1.account,
+    //         })
+    //         getStarknet().account.estimateFee({ contractAddress: L2BridgeContractAddress, entrypoint: "initiate_withdraw", calldata })
+    //             .then((res: any) => console.log(res))
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
     useEffect(() => {
         if (context.bridgeDirection == 0)
             computeFee()
         // else
-        // computeStarkFee()
+        //     computeStarkFee()
     }, [accountInfo.L1.account])
 
     const handleDeposit = async () => {
         try {
-            await new Promise<void>(done => setTimeout(() => done(), 2000));
-            const tx1 = await grantRoleMinter(L2BridgeContractAddress) //grant burner role
-            await new Promise<void>(done => setTimeout(() => done(), 2000));
-            const date1 = getDate()
-            const receipt1 = await getStarknet().account.getTransactionReceipt(tx1.transaction_hash)
-            addTransaction(receipt1, "MINTER_ROLE", date1, () => { }, () => { })
-            await new Promise<void>(done => setTimeout(() => done(), 2000));
-            const tx2 = await grantRoleBurner(L2BridgeContractAddress)
-            const date2 = getDate()
-            await new Promise<void>(done => setTimeout(() => done(), 2000));
-            const receipt2 = await getStarknet().account.getTransactionReceipt(tx2.transaction_hash)
-            addTransaction(receipt2, "BURNER_ROLE", date2, () => { }, () => { })
+            // await new Promise<void>(done => setTimeout(() => done(), 2000));
+            // const tx1 = await grantRoleMinter(L2BridgeContractAddress) //grant burner role
+            // await new Promise<void>(done => setTimeout(() => done(), 2000));
+            // const date1 = getDate()
+            // const receipt1 = await getStarknet().account.getTransactionReceipt(tx1.transaction_hash)
+            // addTransaction(receipt1, "MINTER_ROLE", date1, () => { }, () => { })
+            // await new Promise<void>(done => setTimeout(() => done(), 2000));
+            // const tx2 = await grantRoleBurner(L2BridgeContractAddress)
+            // const date2 = getDate()
+            // await new Promise<void>(done => setTimeout(() => done(), 2000));
+            // const receipt2 = await getStarknet().account.getTransactionReceipt(tx2.transaction_hash)
+            // addTransaction(receipt2, "BURNER_ROLE", date2, () => { }, () => { })
             await setApprovalForAll(accountInfo.L1.account)
             await new Promise<void>(done => setTimeout(() => done(), 5000));
-            const tx = await deposit(
+            await deposit(
                 contractAddress,
                 tokenIds,
                 receivingAddress,
@@ -147,12 +146,12 @@ const ConfirmationScreen = () => {
     }, [])
     const checkStorage = () => {
         if (localStorage.getItem('Initial_contract_token')) {
-            context.setTokenIds(JSON.parse(localStorage.getItem("tokenIds")))
+            context.setTokenIds(JSON.parse(localStorage.getItem("tokenIds") ?? ''))
             context.setSendingAddress(localStorage.getItem("Sending_Address"))
             context.setSelectedContractAddress(localStorage.getItem('Initial_contract_token'))
             context.setReceivingAddress(localStorage.getItem('Receiving_Address'))
             context.setSelectedContractAddress2(localStorage.getItem("Arrival_contract_token"))
-            context.setTokenImage(JSON.parse(localStorage.getItem("imageIds")))
+            context.setTokenImage(JSON.parse(localStorage.getItem("imageIds") ?? ''))
             context.setTracker(localStorage.getItem('Tracker'))
             context.setBridgeDirection(localStorage.getItem('Bridge_Direction'))
         }
@@ -235,7 +234,7 @@ const ConfirmationScreen = () => {
                 <div className={styles.frame11144}>
                     <div className={styles.frame11141}>
                         <div className={styles.text1}>
-                            {context.bridgeDirection === 0 ? "Eth Address" : "Starknet Address"}
+                            {context.bridgeDirection == 0 ? "Eth Address" : "Starknet Address"}
                         </div>
                         <div className={styles.block}>
                             <div className={styles.address1}>
@@ -246,7 +245,7 @@ const ConfirmationScreen = () => {
                     </div>
                     <div className={styles.frame11141}>
                         <div className={styles.text1}>
-                            {context.bridgeDirection === 0 ? "Starknet Address" : "Eth Address"}
+                            {context.bridgeDirection == 0 ? "Starknet Address" : "Eth Address"}
                         </div>
                         <div className={styles.block}>
                             <div className={styles.address1}>
@@ -310,7 +309,7 @@ const ConfirmationScreen = () => {
 
                                 <div className={styles.frame11146}>
                                     <div className={styles.image13}>
-                                        <img src={context.imageToken} style={{ width: "72px" }} />
+                                        <img src={context.imageToken ?? no_image.src} style={{ width: "72px" }} />
                                     </div>
                                     <div className={styles.span}>{id}</div>
                                 </div>
@@ -321,7 +320,7 @@ const ConfirmationScreen = () => {
                             return (
                                 <div className={styles.frame11146}>
                                     <div className={styles.image13}>
-                                        <img src={context.bridgeDirection == 0 ? useImageForIds(contractAddress, id) : useStarknetImageForIds(contractAddress, id)} style={{ width: "72px" }} />
+                                        <img src={context.imageToken ?? no_image.src} style={{ width: "72px" }} />
                                     </div>
                                     <div className={styles.span}>{id}</div>
                                 </div>
@@ -341,7 +340,7 @@ const ConfirmationScreen = () => {
                                 return (
                                     <div className={styles.frame11146}>
                                         <div className={styles.image13}>
-                                            <img src={context.bridgeDirection == 0 ? useImageForIds(contractAddress, id) : useStarknetImageForIds(contractAddress, id)} style={{ width: "72px" }} />
+                                            <img src={context.imageToken ?? no_image.src} style={{ width: "72px" }} />
                                         </div>
                                         <div className={styles.span}>{id}</div>
                                     </div>
@@ -368,8 +367,8 @@ const ConfirmationScreen = () => {
                                 {fee} ETH
                             </div>
                         </div>
-                        <div className={styles.conversion}> $ {usdPrice.toFixed(7)}
-                        </div>
+                        {/* <div className={styles.conversion}> $ {usdPrice.toFixed(7)}
+                        </div> */}
                     </div>
                     <div className={styles.warning}>
                         Your wallet may ask you to sign with a slightly higher gas due to the
@@ -409,9 +408,9 @@ const ConfirmationScreen = () => {
                         </div>
 
                     }
-                    <TransactionStatus title="2. Granting Minter Role " code="MINTER_ROLE" isL1={false} isStarted={transactionsL2.length != 0 && transactionsL2[0].code !== "NOT_RECEIVED"} />
-                    <TransactionStatus title="Granting Burner Role" code="BURNER_ROLE" isL1={false} isStarted={transactionsL2.length >= 2 && transactionsL2[1].code !== "NOT_RECEIVED"} />
-                    <TransactionStatus title='Set Approval for All' code="SET_APPROVAL_FOR_ALL" isL1={true} isStarted={(transactionsL2.length == 2) && (transactionsL2[1].code === "RECEIVED" || transactionsL2[1].code === "PENDING" || transactionsL2[1].code === "ACCEPTED_ON_L2" || transactionsL2[1].code === "ACCEPTED_ON_L1")} />
+                    {/* <TransactionStatus title="2. Granting Minter Role " code="MINTER_ROLE" isL1={false} isStarted={transactionsL2.length != 0 && transactionsL2[0].code !== "NOT_RECEIVED"} />
+                    <TransactionStatus title="Granting Burner Role" code="BURNER_ROLE" isL1={false} isStarted={transactionsL2.length >= 2 && transactionsL2[1].code !== "NOT_RECEIVED"} /> */}
+                    <TransactionStatus title='Set Approval for All' code="SET_APPROVAL_FOR_ALL" isL1={true} isStarted={true} />
                     <TransactionStatus title="Deposit and migration to Starknet" code="DEPOSIT" isL1={true} isStarted={transactionsL1.length >= 1 && transactionsL1[0].code} />
                 </div>
             }

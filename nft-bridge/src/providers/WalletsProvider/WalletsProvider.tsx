@@ -22,6 +22,8 @@ export const WalletsProvider = ({ children }: { children: any }) => {
     updateWalletL2(walletL2);
   }, [accountL2, statusL2, errorL2]);
 
+  // useEffect(() => { if (localStorage.getItem("status") === "connected") { walletL1.connect("injected").then( setWalletConfigL1(walletConfig)) } }, []);
+  // useEffect(() => { if (localStorage.getItem('statusL2') === "connected") { walletConfigL2 = JSON.parse(localStorage.getItem("WalletConfigL2")); walletL2.connect(WalletConfigL2).then(chosenWalletConfig => setWalletConfigL2(chosenWalletConfig)) } }, [])
   useEffect(() => {
     // To support serializable object in the store
     const serializedError = statusL1 === WalletStatus.ERROR ? { ...errorL1 } : null;
@@ -40,15 +42,21 @@ export const WalletsProvider = ({ children }: { children: any }) => {
 
   const connectWalletL1 = async (walletConfig: any) => {
     const { connectorId } = walletConfig;
-    return walletL1.connect(connectorId).then(() => setWalletConfigL1(walletConfig));
+    console.log(connectorId)
+    return walletL1.connect('injected')
+      .then(() => { localStorage.setItem("status", "connected"); setWalletConfigL1(walletConfig) });
   };
 
   const resetWalletL1 = () => {
-    setWalletConfigL1(null);
+    setWalletConfigL1(null)
+    localStorage.setItem("status", "disconnected");
     return walletL1.reset();
   };
 
   const connectWalletL2 = async (walletConfig: any) => {
+    console.log(walletConfig)
+    localStorage.setItem("WalletConfigL2", JSON.stringify(walletConfig))
+    localStorage.setItem("statusL2", "connected")
     return walletL2
       .connect(walletConfig)
       .then(chosenWalletConfig => setWalletConfigL2(chosenWalletConfig));
@@ -56,6 +64,8 @@ export const WalletsProvider = ({ children }: { children: any }) => {
 
   const resetWalletL2 = () => {
     setWalletConfigL2(null);
+    localStorage.setItem('WalletConfigL2', "")
+    localStorage.setItem("statusL2", "disconnected")
     return walletL2.reset();
   };
 

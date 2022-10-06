@@ -1,11 +1,18 @@
 import { Image } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import "@fontsource/rajdhani"
 import styles from '../Header/Header.module.scss'
+import { NftContext } from '../../providers/NftProvider/NftProvider'
 
 const Header = () => {
   const [activeIndex, setActiveIndex] = useState(1)
+  const [network, setNetwork] = useState('Testnet')
   const handleClick = (index: any) => { setActiveIndex(index) }
+  const context = useContext(NftContext)
+  const handleClickNetwork = () => {
+    if (network == "Testnet") { setNetwork("Mainnet"); context.setNetwork("Mainnet") }
+    else { setNetwork("Testnet") }
+  }
   return (
     <div className={styles.header}>
       <div className={styles.imageA}>
@@ -15,8 +22,8 @@ const Header = () => {
         <div className={styles.frame3} style={1 === activeIndex ? { color: '#57c6e4', borderBottom: 'solid 5px #57c6e4' } : { color: 'white' }} onClick={() => handleClick(1)}>
           <span className={styles.bridgeTokens}> Bridge Token</span>
         </div>
-        <div className={styles.frame7} style={2 === activeIndex ? { color: '#57c6e4', borderBottom: 'solid 5px #57c6e4' } : { color: 'white' }} onClick={() => handleClick(2)}>
-          <span className={styles.verifyContract}>Verify Contract</span>
+        <div className={styles.frame7} style={2 === activeIndex ? { color: '#57c6e4', borderBottom: 'solid 5px #57c6e4' } : { color: 'white' }} onClick={() => { handleClick(2); window.open("https://github.com/immutable/imx-starknet", "_blank") }}>
+          <span className={styles.verifyContract} >Verify Contract</span>
         </div>
         <div className={styles.frame3} style={3 === activeIndex ? { color: '#57c6e4', borderBottom: 'solid 5px #57c6e4' } : { color: 'white' }} onClick={() => handleClick(3)}>
           <span className={styles.docs}>Docs</span>

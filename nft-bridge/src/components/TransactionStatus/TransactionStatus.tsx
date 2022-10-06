@@ -25,7 +25,6 @@ interface Receipt {
 }
 export const TransactionStatus = (status: Status) => {
     const { transactionsL2 } = useTransaction()
-    console.log(transactionsL2)
     const { transactionsL1 } = useTransactionL1()
     if (!status.isStarted) {
         return (
@@ -94,9 +93,10 @@ export const TransactionStatus = (status: Status) => {
                         <ReceiptTransaction title={status.title} state="Pending" date="---" isL1={status.isL1} />)
                 }
                 else {
+                    //A RECTIFIER
                     return (
 
-                        <ReceiptTransaction title={status.title} state={transactionsL1[1].code ? "Accepted" : "Rejected"} date={transactionsL1[1].date} txHash={transactionsL1[1].txHash} isL1={status.isL1} />
+                        <ReceiptTransaction title={status.title} state={transactionsL1[1].code ? "Accepted" : "Pending"} date={transactionsL1[1].date} txHash={transactionsL1[1].txHash} isL1={status.isL1} />
                     )
                 }
 

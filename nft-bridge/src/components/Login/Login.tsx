@@ -140,6 +140,10 @@ export const Login = (props: any) => {
             });
         }
     };
+    useEffect(() => {
+        if (statusL1 === WalletStatus.CONNECTED || statusL2 === WalletStatus.CONNECTED)
+            setError(null)
+    }, [statusL1])
 
     const getStarkNFTs = useCallback((collectionAddresses: string[], owner: string) => {
         const filteredCollection = collectionAddresses.filter(function (value, index, arr) { return value !== "" })
@@ -220,7 +224,7 @@ export const Login = (props: any) => {
             <ConnectWallet name="Ethereum"
                 network="ETH"
                 logoURL={ethLogo}
-                type="mainnet"
+                type={supportedL1ChainId === 1 ? "mainnet" : "testnet"}
                 address={statusL1 === WalletStatus.CONNECTED ? truncateAddress2(accountInfo.L1.account) : "-"}
                 balance={statusL1 === WalletStatus.CONNECTED ? EthBalanceMeta : '-'}
                 error={network === NetworkType.L1 ? error?.message : null}>
@@ -230,7 +234,7 @@ export const Login = (props: any) => {
                 name="StarkNet"
                 network="STARKNET"
                 logoURL={starknetLogo}
-                type="mainnet"
+                type={supportedL1ChainId === 1 ? "mainnet" : "testnet"}
                 address={statusL2 === WalletStatus.CONNECTED ? truncateAddress(accountInfo.L2.account) : "-"}
                 balance={statusL2 === WalletStatus.CONNECTED ? EthBalanceStark : '-'}
                 error={network === NetworkType.L2 ? error?.message : null}>

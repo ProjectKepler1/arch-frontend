@@ -45,7 +45,6 @@ export const useStarknetNFTCollectionGroupBy = () => {
             (groups[key(item)] ||= []).push(item);
             return groups;
         }, {} as Record<K, T[]>);
-    console.log(newColl)
     groupByCollection = groupBy<any, any>(newColl, ((nft: any) => nft.contract_address))
     return (groupByCollection)
 
@@ -61,7 +60,6 @@ export const useStarknetNFTCollectionGroupByWithCont = (context: any) => {
             return groups;
         }, {} as Record<K, T[]>);
     groupByCollection = groupBy<any, any>(newColl, ((nft: any) => nft.contract_address))
-    console.log(groupByCollection)
     return (groupByCollection)
 }
 
@@ -82,7 +80,6 @@ export const useTokenIds = () => {
 }
 export const useTokenIdsToNumber = () => {
     const context = useContext(NftContext)
-    console.log(context.tokenIds)
     return context.tokenIds.map((str: string) => { return Number(str) })
 
 }

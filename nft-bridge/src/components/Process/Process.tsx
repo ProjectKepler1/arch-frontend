@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { NftContext } from '../../providers/NftProvider/NftProvider'
 import { web3 } from '../../libs'
 import { useNFTCollectionGroupBy, useStarknetNFTCollectionGroupBy } from '../../providers/NftProvider/nft-hooks'
-
+import no_image from "../../assets/svg/vector/no-image-6663.svg"
 
 const Process = () => {
     const [inputState, setInputState] = useState<boolean | null>(null)
@@ -23,7 +23,6 @@ const Process = () => {
     const [show, setShow] = useState<boolean>(false)
     const [contract, setContract] = useState<string | null>(null)
     const [tokenId, setTokenId] = useState<string[]>([])
-    // const [bridgeregistry, setBridgeRegistry] = useState<any>()
     const [change, setChange] = useState<boolean>(false)
     const [change1, setChange1] = useState<boolean>(false)
     const starknetAddress: string = accountInfo.L2.account
@@ -31,6 +30,7 @@ const Process = () => {
     const context = useContext(NftContext)
     const [shownAddress, setShownAddres] = useState<string | null>(null)
     const [receivingAddress1, setReceivingAddress1] = useState<string | null>(null)
+    const svgToDataURL = require('svg-to-dataurl')
     const handleChange = () => {
         setChange(!change)
     }
@@ -103,7 +103,7 @@ const Process = () => {
         }
         else if (context.bridgeDirection == 1) {
             context.setSendingAddress(starknetAddress)
-            localStorage.setItem("Receiving_Address", starknetAddress)
+            localStorage.setItem("Sending_Address", starknetAddress)
         }
 
         localStorage.setItem("tokenIds",

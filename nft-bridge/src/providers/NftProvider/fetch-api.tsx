@@ -18,7 +18,6 @@ export const apiFetch = (collectionAddresses: string[], owner: string) => {
         filteredCollection.forEach(async (address) => promises.push(await getSingleStarkNFT(address, owner)))
         const array: any = []
         promises.forEach((element: any) => array.push(...element))
-        console.log(array)
         context.setStarknetBridgeregistry(array)
 
     }, [registry])

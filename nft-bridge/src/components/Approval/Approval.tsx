@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styles from "./Approval.module.scss"
-import TransactionStatus from '../TransactionStatus/TransactionStatus'
+import { TransactionStatus } from '../TransactionStatus/TransactionStatus'
 import { useReceivingAddress, useSelectedContractAddress, useTokenIds } from '../../providers/NftProvider/nft-hooks'
 import { accountInfo } from '../../providers/WalletsProvider'
 import { useStandardERCBridgeContract } from '../../contracts/StandardERCBridge'

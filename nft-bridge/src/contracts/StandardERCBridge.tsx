@@ -35,14 +35,6 @@ export const useStandardERCBridgeContract = () => {
                 addTransactionL1(receipt, "DEPOSIT", getDate(), () => { }, () => { })
 
             })
-        // .on('confirmation', function (receipt: any) {
-        //     if (variable == false) {
-        //         console.log(receipt[0])
-        //         addTransactionL1(receipt, "DEPOSIT", getDate(), () => { }, () => { })
-        //         variable = true
-        //     }
-        // })
-
     }
 
     const estimateDeposit = async (token_L1_address: string, tokenIds: BigNumber[], sender_L2_address: BigNumber, from: string): Promise<BigNumber> => {
